@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spreadsheet Mastery — Google Sheets থেকে Excel (৩০ দিনের বাংলা কোর্স)</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f4; --panel:#ffffff; --ink:#16211c; --ink-soft:#5c6b63;
+  --line:#e2e6e0; --accent:#0f7a4f; --accent-soft:#e6f4ec;
+  --warn:#b5651d; --warn-soft:#fdf1e3; --code-bg:#12211a; --code-ink:#9be8b8;
+  --blue:#1d5fa8; --blue-soft:#e8f0fa;
+  --sidebar-w:300px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1512; --panel:#151f1a; --ink:#e6ede8; --ink-soft:#94a69c;
+  --line:#243128; --accent:#3fd693; --accent-soft:#12291f;
+  --warn:#e0a06a; --warn-soft:#2a2118; --code-bg:#0a120e; --code-ink:#9be8b8;
+  --blue:#7fb2ec; --blue-soft:#152436;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Hind Siliguri',system-ui,sans-serif;
+  background:var(--bg); color:var(--ink);
+  font-size:16.5px; line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+}
+code,kbd,.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+
+/* ---------- LAYOUT ---------- */
+.wrap{display:flex;min-height:100vh}
+aside{
+  width:var(--sidebar-w); flex:0 0 var(--sidebar-w);
+  background:var(--panel); border-right:1px solid var(--line);
+  height:100vh; position:sticky; top:0; overflow-y:auto;
+  padding:22px 0 60px;
+}
+main{flex:1;min-width:0;padding:0 0 100px}
+.container{max-width:920px;margin:0 auto;padding:0 32px}
+
+/* ---------- SIDEBAR ---------- */
+.brand{padding:0 20px 18px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.brand h1{font-size:19px;font-weight:700;line-height:1.35;letter-spacing:-.2px}
+.brand .sub{font-size:12.5px;color:var(--ink-soft);margin-top:4px;font-weight:500}
+.searchbox{padding:0 20px 14px}
+.searchbox input{
+  width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:9px;
+  background:var(--bg);color:var(--ink);font-family:inherit;font-size:14px;
+}
+.searchbox input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.navphase{padding:16px 20px 5px;font-size:11px;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--ink-soft)}
+.navlink{
+  display:flex;align-items:flex-start;gap:9px;padding:6px 20px;
+  font-size:14px;color:var(--ink-soft);text-decoration:none;cursor:pointer;
+  border-left:3px solid transparent;transition:.13s;
+}
+.navlink:hover{background:var(--accent-soft);color:var(--ink)}
+.navlink.active{border-left-color:var(--accent);color:var(--accent);font-weight:600;background:var(--accent-soft)}
+.navlink.done .nvd{background:var(--accent);border-color:var(--accent);color:#fff}
+.nvd{
+  flex:0 0 22px;height:20px;margin-top:3px;border:1px solid var(--line);border-radius:5px;
+  font-size:10.5px;display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--ink-soft);
+}
+.navlink.hidden{display:none}
+
+/* ---------- TOPBAR ---------- */
+.topbar{
+  position:sticky;top:0;z-index:20;background:var(--panel);
+  border-bottom:1px solid var(--line);padding:12px 32px;
+  display:flex;align-items:center;gap:16px;
+}
+.progwrap{flex:1}
+.progbar{height:7px;background:var(--line);border-radius:99px;overflow:hidden}
+.progfill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:.35s}
+.progtxt{font-size:12px;color:var(--ink-soft);margin-top:3px;font-weight:600}
+.btn{
+  border:1px solid var(--line);background:var(--bg);color:var(--ink);
+  padding:7px 13px;border-radius:8px;font-family:inherit;font-size:13px;
+  font-weight:600;cursor:pointer;white-space:nowrap;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- HERO ---------- */
+.hero{padding:46px 0 30px}
+.hero .kicker{font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--accent);margin-bottom:12px}
+.hero h2{font-size:38px;line-height:1.3;font-weight:700;letter-spacing:-.6px;margin-bottom:14px}
+.hero p{font-size:17px;color:var(--ink-soft);max-width:660px}
+.heroGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:26px}
+.heroCard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:15px 16px}
+.heroCard b{display:block;font-size:23px;color:var(--accent);font-weight:700;line-height:1.2}
+.heroCard span{font-size:13px;color:var(--ink-soft);font-weight:500}
+
+/* ---------- DAY CARD ---------- */
+.phasehead{
+  margin:44px 0 18px;padding:18px 22px;border-radius:14px;
+  background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--accent);
+}
+.phasehead .pn{font-size:11.5px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--accent)}
+.phasehead h3{font-size:23px;font-weight:700;margin:3px 0 5px;letter-spacing:-.3px}
+.phasehead p{font-size:14.5px;color:var(--ink-soft)}
+
+.day{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  margin-bottom:14px;overflow:hidden;scroll-margin-top:80px;
+}
+.day.hidden{display:none}
+.dayhead{display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;user-select:none}
+.dayhead:hover{background:var(--accent-soft)}
+.daynum{
+  flex:0 0 46px;height:46px;border-radius:11px;background:var(--accent-soft);
+  color:var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-weight:700;line-height:1;
+}
+.daynum small{font-size:8.5px;letter-spacing:.5px;opacity:.75;margin-bottom:2px}
+.daynum span{font-size:17px}
+.daymeta{flex:1;min-width:0}
+.daymeta h4{font-size:17.5px;font-weight:600;letter-spacing:-.2px;line-height:1.4}
+.daymeta p{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin-top:1px}
+.chk{
+  flex:0 0 26px;height:26px;border:2px solid var(--line);border-radius:7px;
+  background:var(--bg);cursor:pointer;position:relative;transition:.15s;
+}
+.chk:hover{border-color:var(--accent)}
+.chk.on{background:var(--accent);border-color:var(--accent)}
+.chk.on::after{
+  content:"";position:absolute;left:7px;top:3px;width:7px;height:12px;
+  border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);
+}
+.caret{flex:0 0 18px;color:var(--ink-soft);font-size:12px;transition:.2s}
+.day.open .caret{transform:rotate(90deg)}
+.body{display:none;padding:4px 22px 26px;border-top:1px solid var(--line)}
+.day.open .body{display:block}
+.day.done .daynum{background:var(--accent);color:#fff}
+
+/* ---------- CONTENT ELEMENTS ---------- */
+.body h5{font-size:15.5px;font-weight:700;margin:24px 0 8px;letter-spacing:-.1px;
+  display:flex;align-items:center;gap:8px}
+.body h5::before{content:"";width:4px;height:16px;background:var(--accent);border-radius:2px;flex:0 0 4px}
+.body p{margin:9px 0}
+.body ul,.body ol{margin:9px 0 9px 22px}
+.body li{margin:5px 0}
+.body strong{font-weight:600}
+.body em{font-style:normal;background:var(--accent-soft);padding:1px 5px;border-radius:4px;
+  font-weight:500;font-size:.96em}
+kbd{
+  background:var(--bg);border:1px solid var(--line);border-bottom-width:2px;
+  border-radius:5px;padding:1px 6px;font-size:12.5px;font-weight:600;white-space:nowrap;
+}
+.steps{counter-reset:s;list-style:none;margin-left:0!important}
+.steps li{counter-increment:s;position:relative;padding-left:34px;margin:10px 0}
+.steps li::before{
+  content:counter(s);position:absolute;left:0;top:2px;width:23px;height:23px;
+  background:var(--accent);color:#fff;border-radius:50%;font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+}
+.fx{
+  position:relative;background:var(--code-bg);border-radius:10px;
+  padding:13px 46px 13px 15px;margin:11px 0;overflow-x:auto;
+}
+.fx code{color:var(--code-ink);font-size:13.5px;white-space:pre;display:block;line-height:1.7}
+.cp{
+  position:absolute;top:8px;right:8px;background:rgba(255,255,255,.09);border:0;
+  color:#9be8b8;border-radius:6px;padding:4px 8px;font-size:10.5px;font-weight:700;
+  cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;
+}
+.cp:hover{background:rgba(255,255,255,.2)}
+.note,.task,.warn{border-radius:11px;padding:13px 16px;margin:14px 0;font-size:15px}
+.note{background:var(--blue-soft);border-left:4px solid var(--blue)}
+.task{background:var(--accent-soft);border-left:4px solid var(--accent)}
+.warn{background:var(--warn-soft);border-left:4px solid var(--warn)}
+.note b,.task b,.warn b{display:block;margin-bottom:5px;font-size:12px;letter-spacing:1.1px;
+  text-transform:uppercase;font-weight:700}
+.note b{color:var(--blue)} .task b{color:var(--accent)} .warn b{color:var(--warn)}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:700;font-size:13px}
+td code{font-size:12.5px;background:var(--bg);padding:1px 5px;border-radius:4px;
+  border:1px solid var(--line)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.emptymsg{text-align:center;padding:60px 20px;color:var(--ink-soft);display:none}
+.emptymsg.show{display:block}
+
+.footer{margin-top:60px;padding:28px 0;border-top:1px solid var(--line);
+  color:var(--ink-soft);font-size:14px;text-align:center}
+
+.mobbtn{display:none}
+@media(max-width:1000px){
+  aside{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:.25s;
+    box-shadow:0 0 40px rgba(0,0,0,.25)}
+  aside.show{transform:none}
+  .mobbtn{display:block}
+  .container{padding:0 18px}
+  .topbar{padding:10px 18px}
+  .hero h2{font-size:28px}
+  .grid2{grid-template-columns:1fr}
+  body{font-size:16px}
+}
+@media print{
+  aside,.topbar,.chk,.caret,.cp{display:none!important}
+  .body{display:block!important}
+  .day{break-inside:avoid;border:1px solid #ccc}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<aside id="sidebar">
+  <div class="brand">
+    <h1>Spreadsheet Mastery</h1>
+    <div class="sub">Google Sheets → Excel · ৩০ দিনের বাংলা রোডম্যাপ</div>
+  </div>
+  <div class="searchbox">
+    <input type="search" id="search" placeholder="খুঁজুন — যেমন VLOOKUP, Pivot...">
+  </div>
+  <nav id="nav"></nav>
+</aside>
+
+<main>
+  <div class="topbar">
+    <button class="btn mobbtn" id="menuBtn">☰</button>
+    <div class="progwrap">
+      <div class="progbar"><div class="progfill" id="progfill"></div></div>
+      <div class="progtxt" id="progtxt">০ / ৩০ দিন সম্পন্ন</div>
+    </div>
+    <button class="btn" id="expandBtn">সব খুলুন</button>
+    <button class="btn" id="themeBtn">🌙</button>
+  </div>
+
+  <div class="container">
+    <div class="hero">
+      <div class="kicker">Zero → Master · সম্পূর্ণ বাংলায়</div>
+      <h2>স্প্রেডশিট শেখার ৩০ দিনের পরিপূর্ণ পথ</h2>
+      <p>প্রথম ২০ দিন <strong>Google Sheets</strong> — ফ্রি, ব্রাউজারেই চলে, ইনস্টল লাগে না। এরপর শেষ ১০ দিন <strong>Microsoft Excel</strong> — যেখানে অফিসের আসল কাজ হয়। প্রতিদিন ১–১.৫ ঘণ্টা দিলে ৩০ দিন পরে আপনি চাকরির যেকোনো ডেটা-রিপোর্টিং কাজ নিজে করতে পারবেন।</p>
+      <div class="heroGrid">
+        <div class="heroCard"><b>৩০</b><span>দিনের প্ল্যান</span></div>
+        <div class="heroCard"><b>৪</b><span>ধাপ / Phase</span></div>
+        <div class="heroCard"><b>৫</b><span>হাতে-কলমে প্রজেক্ট</span></div>
+        <div class="heroCard"><b>৮০+</b><span>ফাংশন ও ফর্মুলা</span></div>
+      </div>
+      <div class="note" style="margin-top:26px">
+        <b>কীভাবে ব্যবহার করবেন</b>
+        যেকোনো দিনের কার্ডে ক্লিক করলে সেটা খুলবে। ডান দিকের ☐ বক্সে টিক দিলে উপরের প্রগ্রেস বার এগোবে ও বাঁ দিকের মেনুতে দিনটা সবুজ হয়ে যাবে। ফর্মুলার উপর <span class="mono" style="font-size:12px">COPY</span> বোতাম চাপলে ফর্মুলা কপি হবে — সোজা শিটে পেস্ট করুন।
+        <br><br><strong>নিয়ম একটাই:</strong> শুধু পড়বেন না। প্রতিটা দিনের শেষে যে <em>আজকের কাজ</em> আছে, সেটা নিজের হাতে শিটে করবেন। না করলে পরের দিন যাবেন না।
+      </div>
+    </div>
+
+    <div id="content"></div>
+    <div class="emptymsg" id="empty">🔍 কিছু পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন।</div>
+
+    <div class="footer">
+      ৩০ দিন শেষ? তাহলে আপনি আর beginner নন। এখন শুধু <strong>আসল ডেটা নিয়ে কাজ করুন</strong> — শেখাটা তখনই পাকা হয়।
+    </div>
+  </div>
+</main>
+</div>
+
+<script>
+/* =======================================================================
+   COURSE DATA
+   ======================================================================= */
+const COURSE = [
+{
+  pn:"Phase 1 · দিন ১–১০",
+  title:"Google Sheets — ভিত্তি (Foundation)",
+  desc:"স্প্রেডশিট কী, ডেটা কীভাবে সাজায়, আর বেসিক ফর্মুলা। এই ১০ দিন শক্ত হলে বাকি ২০ দিন সহজ।",
+  days:[
+  {n:1,t:"স্প্রেডশিট কী ও Google Sheets শুরু",g:"অ্যাকাউন্ট খোলা, প্রথম শিট তৈরি, স্ক্রিনের প্রতিটা অংশ চেনা।",
+  html:`
+<h5>স্প্রেডশিট আসলে কী?</h5>
+<p>স্প্রেডশিট হলো ছোট ছোট ঘরের একটা বিশাল খাতা। প্রতিটা ঘরে আপনি সংখ্যা, লেখা বা তারিখ রাখতে পারেন — আর সবচেয়ে বড় ক্ষমতা হলো, <strong>একটা ঘর অন্য ঘরের হিসাব নিজে করে দিতে পারে</strong>।</p>
+<p>ক্যালকুলেটরে ১০০ জনের বেতন যোগ করতে ১০০ বার টিপতে হয়। স্প্রেডশিটে একবার ফর্মুলা লিখলেই হয় — পরে কোনো একজনের বেতন বদলালে যোগফল <strong>নিজে থেকেই</strong> বদলে যায়। এটাই পুরো জিনিসটার মূল জাদু।</p>
+<div class="note"><b>কেন Google Sheets দিয়ে শুরু</b>
+টাকা লাগে না, ইনস্টল লাগে না, ব্রাউজার থাকলেই চলে। কাজ অটো-সেভ হয় — কারেন্ট গেলেও কিছু হারায় না। আর Sheets-এ যা শিখবেন তার ৯০% Excel-এ হুবহু একইভাবে কাজ করে। তাই Sheets = ফ্রি প্র্যাকটিস গ্রাউন্ড, Excel = অফিসের মাঠ।</div>
+
+<h5>আজকের হাতে-কলমে ধাপ</h5>
+<ol class="steps">
+<li>একটা Gmail অ্যাকাউন্ট থাকলে সেটাই যথেষ্ট। না থাকলে <em>accounts.google.com</em> থেকে খুলে নিন।</li>
+<li>ব্রাউজারে গিয়ে টাইপ করুন <em>sheets.new</em> — এন্টার চাপলেই একটা নতুন খালি শিট খুলে যাবে। এটা সবচেয়ে দ্রুত উপায়, মনে রাখুন।</li>
+<li>উপরে বাঁ দিকে "Untitled spreadsheet" লেখায় ক্লিক করে নাম দিন: <em>Day 1 Practice</em></li>
+<li>A1 ঘরে ক্লিক করে লিখুন <strong>নাম</strong>, B1-এ <strong>বয়স</strong>, C1-এ <strong>শহর</strong>। নিচের ৩ সারিতে নিজের ও ২ জন বন্ধুর তথ্য দিন।</li>
+</ol>
+
+<h5>স্ক্রিনের কোন অংশ কী</h5>
+<table>
+<tr><th>অংশ</th><th>কোথায়</th><th>কাজ</th></tr>
+<tr><td><strong>Cell</strong></td><td>মাঝের প্রতিটা ঘর</td><td>ডেটা রাখার সবচেয়ে ছোট একক</td></tr>
+<tr><td><strong>Column</strong></td><td>উপরে A, B, C...</td><td>খাড়া/লম্বালম্বি সারি</td></tr>
+<tr><td><strong>Row</strong></td><td>বাঁয়ে ১, ২, ৩...</td><td>আড়াআড়ি সারি</td></tr>
+<tr><td><strong>Name Box</strong></td><td>উপরে বাঁয়ে ছোট বক্স</td><td>এখন কোন ঘরে আছেন দেখায় (যেমন C5)</td></tr>
+<tr><td><strong>Formula Bar</strong></td><td>Name Box-এর পাশে, <em>fx</em> চিহ্ন</td><td>ঘরের ভেতরের আসল ফর্মুলা দেখায়</td></tr>
+<tr><td><strong>Sheet tab</strong></td><td>একদম নিচে "Sheet1"</td><td>এক ফাইলে অনেক পাতা রাখা যায়</td></tr>
+</table>
+<div class="warn"><b>এই ভুলটা সবাই করে</b>
+ঘরে দেখাচ্ছে <code>৫০০</code>, কিন্তু ভেতরে হয়তো লেখা <code>=250*2</code>। ঘরের ভেতরে <strong>আসলে</strong> কী আছে সেটা সবসময় Formula Bar-এ দেখুন। কোনো হিসাব মিলছে না? প্রথম কাজ — Formula Bar দেখুন।</div>
+
+<h5>যে ৩টা শর্টকাট আজই মুখস্থ</h5>
+<ul>
+<li><kbd>Ctrl</kbd>+<kbd>Z</kbd> — ভুল হলে পিছিয়ে যান। নির্ভয়ে এক্সপেরিমেন্ট করার সাহস এখান থেকেই আসে।</li>
+<li><kbd>Ctrl</kbd>+<kbd>Enter</kbd> ছাড়া শুধু <kbd>Enter</kbd> — লেখা শেষ করে নিচের ঘরে যায়।</li>
+<li><kbd>Tab</kbd> — লেখা শেষ করে ডান দিকের ঘরে যায়। সারি ভরার সময় Enter-এর চেয়ে দ্রুত।</li>
+</ul>
+<div class="task"><b>আজকের কাজ</b>
+৫ জন মানুষের নাম, বয়স ও শহর দিয়ে একটা ছোট টেবিল বানান। তারপর <em>File → Version history → See version history</em> খুলে দেখুন Google আপনার প্রতিটা পরিবর্তন সেভ করে রেখেছে কি না। এই ফিচারটার জন্যই স্প্রেডশিটে ভুল করা নিরাপদ।</div>`},
+
+  {n:2,t:"Cell, Range ও দ্রুত ডেটা এন্ট্রি",g:"Range মানে বোঝা, কীবোর্ড দিয়ে দ্রুত চলাফেরা, একসাথে অনেক ঘর ভরা।",
+  html:`
+<h5>Range — পুরো কোর্সের সবচেয়ে দরকারি শব্দ</h5>
+<p>একটা ঘর = Cell। পাশাপাশি একগুচ্ছ ঘর = <strong>Range</strong>। লেখার নিয়ম: শুরুর ঘর, তারপর কোলন, তারপর শেষের ঘর।</p>
+<table>
+<tr><th>লেখা</th><th>মানে</th></tr>
+<tr><td><code>A1</code></td><td>শুধু একটা ঘর</td></tr>
+<tr><td><code>A1:A10</code></td><td>A কলামের ১ থেকে ১০ নম্বর ঘর — মোট ১০টা</td></tr>
+<tr><td><code>A1:C10</code></td><td>একটা চারকোনা ব্লক — ৩ কলাম × ১০ সারি = ৩০ ঘর</td></tr>
+<tr><td><code>A:A</code></td><td>পুরো A কলাম, শেষ পর্যন্ত</td></tr>
+<tr><td><code>2:2</code></td><td>পুরো ২ নম্বর সারি</td></tr>
+</table>
+<div class="note"><b>মাথায় গেঁথে নিন</b>
+ভবিষ্যতে <code>=SUM(B2:B50)</code> লিখবেন। এর মানে "B2 থেকে B50 পর্যন্ত সবগুলো যোগ করো"। Range না বুঝলে কোনো ফর্মুলা বুঝবেন না — তাই আজকের দিনটা হালকাভাবে নেবেন না।</div>
+
+<h5>মাউস ছেড়ে দিন — কীবোর্ড দিয়ে চলুন</h5>
+<table>
+<tr><th>শর্টকাট</th><th>কী হয়</th></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>↓</kbd></td><td>কলামে ডেটা যেখানে শেষ, এক লাফে সেখানে</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Home</kbd></td><td>একদম A1-এ ফিরে আসা</td></tr>
+<tr><td><kbd>Shift</kbd>+<kbd>→</kbd> / <kbd>↓</kbd></td><td>এক ঘর করে সিলেক্ট বাড়ানো</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↓</kbd></td><td>নিচের সব ডেটা এক চাপে সিলেক্ট — সবচেয়ে বেশি কাজে লাগবে</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Space</kbd></td><td>পুরো কলাম সিলেক্ট</td></tr>
+<tr><td><kbd>Shift</kbd>+<kbd>Space</kbd></td><td>পুরো সারি সিলেক্ট</td></tr>
+</table>
+
+<h5>Fill Handle — একবার লিখে বাকিটা টেনে নেওয়া</h5>
+<p>যেকোনো ঘর সিলেক্ট করলে ডান-নিচের কোনায় একটা ছোট নীল চৌকো দেখবেন। ওটা ধরে টানলে Google প্যাটার্ন বুঝে বাকিটা ভরে দেয়।</p>
+<ol class="steps">
+<li>A1-এ লিখুন <code>1</code>, A2-এ <code>2</code>। দুটো সিলেক্ট করে নীল কোনা ধরে A20 পর্যন্ত টানুন → ১ থেকে ২০ পর্যন্ত এসে যাবে।</li>
+<li>B1-এ লিখুন <code>January</code> → টানুন → বাকি মাসগুলো নিজে চলে আসবে।</li>
+<li>C1-এ লিখুন <code>Sat</code>, C2-এ <code>Sun</code> → টানুন → পুরো সপ্তাহ।</li>
+<li>D1-এ লিখুন <code>Emp-001</code> → টানুন → Emp-002, Emp-003... আইডি বানানোর সহজ উপায়।</li>
+</ol>
+<div class="warn"><b>সতর্কতা</b>
+মাত্র একটা সংখ্যা (শুধু <code>1</code>) লিখে টানলে Sheets সব ঘরে <code>1</code>-ই বসাবে — কারণ সে কোনো প্যাটার্ন পায়নি। ধারাবাহিক সংখ্যা চাইলে অন্তত <strong>দুইটা</strong> ঘর ভরে তারপর টানুন।</div>
+
+<h5>Paste-এর ধরনগুলো</h5>
+<ul>
+<li><kbd>Ctrl</kbd>+<kbd>V</kbd> — সব কিছু (ফর্মুলা + রং + বর্ডার) পেস্ট হয়</li>
+<li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> — <strong>শুধু মানটা</strong> পেস্ট হয়, ফর্মুলা বা ফরম্যাট আসে না</li>
+</ul>
+<p>ওয়েবসাইট বা PDF থেকে ডেটা কপি করলে সাথে অদ্ভুত রং-ফন্ট চলে আসে। তখন <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> আপনার বন্ধু।</p>
+<div class="task"><b>আজকের কাজ</b>
+নতুন শিটে কলাম বানান: <strong>SL, EmployeeID, Name, JoinMonth</strong>। Fill Handle দিয়ে SL-এ ১–৩০, EmployeeID-তে EMP-001 থেকে EMP-030, JoinMonth-এ January থেকে শুরু করে টেনে ভরুন। Name-টা হাতে লিখুন — কিন্তু <kbd>Tab</kbd> ও <kbd>Enter</kbd> দিয়ে, মাউস একবারও ছোঁবেন না।</div>`},
+
+  {n:3,t:"Formatting — সংখ্যা, তারিখ, টাকা ঠিকভাবে দেখানো",g:"একটা শিট যেন দেখেই বোঝা যায়। আর সংখ্যা যেন সংখ্যাই থাকে, লেখা না হয়ে যায়।",
+  html:`
+<h5>দুই ধরনের ফরম্যাট — গুলিয়ে ফেলবেন না</h5>
+<p><strong>১. দেখার ফরম্যাট</strong> (Font, রং, বর্ডার) — শুধু সুন্দর দেখানোর জন্য, হিসাবে কোনো প্রভাব নেই।<br>
+<strong>২. Number Format</strong> (টাকা, তারিখ, শতাংশ) — এটা বদলালে Sheets ডেটাটাকে <strong>অন্যভাবে বুঝতে</strong> শুরু করে। এটাই আসল গুরুত্বপূর্ণ জিনিস।</p>
+<div class="warn"><b>যে ভুলে হাজারো রিপোর্ট নষ্ট হয়</b>
+আপনি লিখলেন <code>1,200 Taka</code>। দেখতে সুন্দর — কিন্তু Sheets এটাকে <strong>লেখা (text)</strong> ধরে নিল, সংখ্যা নয়। ফলে SUM করলে ০ আসবে। সঠিক নিয়ম: ঘরে শুধু <code>1200</code> লিখুন, তারপর Number Format দিয়ে টাকার চিহ্ন বসান। <br><br><strong>চেক করার উপায়:</strong> সংখ্যা ডিফল্টে ঘরের <strong>ডান দিকে</strong> বসে, লেখা <strong>বাঁ দিকে</strong>। আপনার সংখ্যা বাঁ দিকে থাকলে সেটা আসলে সংখ্যা নয়।</div>
+
+<h5>Number Format দেওয়ার নিয়ম</h5>
+<ol class="steps">
+<li>যে ঘর/Range-এ দিতে চান সেটা সিলেক্ট করুন</li>
+<li>মেনু থেকে <em>Format → Number</em></li>
+<li>দরকার অনুযায়ী বাছুন: Number, Percent, Currency, Date, Duration</li>
+<li>টাকার চিহ্ন ৳ চাইলে: <em>Format → Number → Custom currency</em> → Bangladeshi Taka খুঁজে নিন</li>
+</ol>
+<table>
+<tr><th>দরকার</th><th>শর্টকাট</th></tr>
+<tr><td>শতাংশ</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>5</kbd></td></tr>
+<tr><td>টাকা/মুদ্রা</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>4</kbd></td></tr>
+<tr><td>তারিখ</td><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>3</kbd></td></tr>
+<tr><td>Bold / Italic / Underline</td><td><kbd>Ctrl</kbd>+<kbd>B</kbd> / <kbd>I</kbd> / <kbd>U</kbd></td></tr>
+</table>
+
+<h5>তারিখ নিয়ে একটা জরুরি সত্য</h5>
+<p>Sheets ও Excel তারিখকে ভেতরে <strong>সংখ্যা</strong> হিসেবে রাখে — ৩০ ডিসেম্বর ১৮৯৯ থেকে কত দিন গেছে সেই সংখ্যা। তাই দুইটা তারিখ বিয়োগ করলে দিনের সংখ্যা পাওয়া যায়।</p>
+<div class="fx"><code>=B2-A2      → দুই তারিখের মাঝে কত দিন</code></div>
+<div class="note"><b>তারিখ লেখার নিরাপদ নিয়ম</b>
+সবসময় <strong>YYYY-MM-DD</strong> ফরম্যাটে লিখুন, যেমন <code>2026-07-28</code>। কারণ <code>05/07/2026</code> লিখলে সেটা ৫ জুলাই না ৭ মে — সেটিংসের উপর নির্ভর করে। বছর আগে লিখলে কোনো দ্বিধা থাকে না।</div>
+
+<h5>যে ৫টা জিনিস প্রতিটা শিটে করবেন</h5>
+<ul>
+<li><strong>হেডার সারি Bold + হালকা রঙের ব্যাকগ্রাউন্ড</strong> — <em>Format → Alternating colours</em> দিলে এক ক্লিকে পুরো টেবিল প্রফেশনাল দেখায়</li>
+<li><strong>হেডার Freeze করুন</strong> — <em>View → Freeze → 1 row</em>। এবার স্ক্রল করলেও হেডার উপরে আটকে থাকবে</li>
+<li><strong>Wrap text</strong> — লম্বা লেখা ঘরের বাইরে বেরিয়ে গেলে <em>Format → Wrapping → Wrap</em></li>
+<li><strong>কলামের সঠিক চওড়া</strong> — কলামের হেডারের বর্ডারে ডাবল-ক্লিক করলে লেখা অনুযায়ী নিজে ফিট হয়</li>
+<li><strong>Merge কম করুন</strong> — দেখতে ভালো লাগে কিন্তু Sort, Filter আর Pivot Table ভেঙে দেয়। শুধু একদম উপরের টাইটেলে ব্যবহার করুন</li>
+</ul>
+<div class="task"><b>আজকের কাজ</b>
+একটা <strong>মাসিক খরচের শিট</strong> বানান — কলাম: Date, Category, Description, Amount। ১০ সারি ডেটা দিন। Date কলামে Date format, Amount কলামে ৳ currency format দিন। হেডার Bold করে Freeze করুন। তারপর নিজে টেস্ট করুন: Amount কলামের সংখ্যাগুলো ডান দিকে বসেছে কি না — বাঁ দিকে থাকলে সেগুলো text হয়ে আছে, ঠিক করুন।</div>`},
+
+  {n:4,t:"প্রথম ফর্মুলা — SUM, AVERAGE, COUNT",g:"ফর্মুলার গঠন বোঝা এবং ৬টা সবচেয়ে বেশি ব্যবহৃত ফাংশন শেখা।",
+  html:`
+<h5>ফর্মুলার তিনটা নিয়ম</h5>
+<ol class="steps">
+<li>সবসময় <code>=</code> দিয়ে শুরু। সমান চিহ্ন না দিলে Sheets ভাববে আপনি শুধু লেখা লিখছেন।</li>
+<li>তারপর ফাংশনের নাম, যেমন <code>SUM</code></li>
+<li>তারপর প্রথম বন্ধনীর ভেতরে কোন ঘরগুলো নিয়ে কাজ করবে: <code>(B2:B10)</code></li>
+</ol>
+<div class="fx"><code>=SUM(B2:B10)
+ ↑    ↑    ↑
+ |    |    └─ কোন Range নিয়ে কাজ করবে
+ |    └────── কী কাজ করবে (যোগ)
+ └─────────── "আমি হিসাব চাই" — এই সংকেত</code></div>
+
+<h5>ছয়টা মৌলিক ফাংশন</h5>
+<table>
+<tr><th>ফাংশন</th><th>কাজ</th><th>উদাহরণ</th></tr>
+<tr><td><code>SUM</code></td><td>সব যোগ করে</td><td><code>=SUM(B2:B20)</code></td></tr>
+<tr><td><code>AVERAGE</code></td><td>গড় বের করে</td><td><code>=AVERAGE(B2:B20)</code></td></tr>
+<tr><td><code>COUNT</code></td><td>কতগুলো <strong>সংখ্যা</strong> আছে গোনে</td><td><code>=COUNT(B2:B20)</code></td></tr>
+<tr><td><code>COUNTA</code></td><td>কতগুলো ঘর <strong>খালি নয়</strong> গোনে (লেখাও গোনে)</td><td><code>=COUNTA(A2:A20)</code></td></tr>
+<tr><td><code>MAX</code></td><td>সবচেয়ে বড়টা</td><td><code>=MAX(B2:B20)</code></td></tr>
+<tr><td><code>MIN</code></td><td>সবচেয়ে ছোটটা</td><td><code>=MIN(B2:B20)</code></td></tr>
+</table>
+<div class="warn"><b>COUNT বনাম COUNTA</b>
+নামের কলামে <code>COUNT</code> দিলে <strong>০</strong> আসবে — কারণ নাম তো সংখ্যা নয়! মানুষ গুনতে হলে <code>COUNTA</code>। সংখ্যা গুনতে <code>COUNT</code>। এই একটা ভুল ইন্টারভিউতে অনেকে করে।</div>
+
+<h5>হাতে-কলমে গণিত</h5>
+<div class="fx"><code>=B2+C2         যোগ
+=B2-C2         বিয়োগ
+=B2*C2         গুণ  (× নয়, তারা চিহ্ন)
+=B2/C2         ভাগ  (÷ নয়, স্ল্যাশ)
+=B2^2          বর্গ
+=(B2+C2)*D2    বন্ধনী আগে হিসাব হয়</code></div>
+<p>হিসাবের ক্রম: বন্ধনী → ঘাত → গুণ/ভাগ → যোগ/বিয়োগ। ভুল এড়াতে সন্দেহ হলেই বন্ধনী দিন।</p>
+
+<h5>একটা কাজের ট্রিক</h5>
+<p>যোগফল বসাতে চান, কিন্তু Range টাইপ করতে আলসেমি? সংখ্যার কলামটা সিলেক্ট করলে নিচে-ডানে একটা ছোট <strong>Σ (Explore)</strong> বোতাম আসে — সেখানে Sum, Average, Min, Max সব দেখানো থাকে, ক্লিক করে বসিয়ে দিতে পারবেন। <br>আর ঘরে শুধু <code>=SUM(</code> লিখে মাউস দিয়ে Range সিলেক্ট করলেই Sheets নিজে ঠিকানা বসিয়ে দেয় — টাইপ করতে হয় না। <em>(Excel-এ এই কাজটার শর্টকাট <kbd>Alt</kbd>+<kbd>=</kbd> — দিন ২২-এ পাবেন।)</em></p>
+<div class="note"><b>শতাংশ বের করার নিয়ম</b>
+অংশ ÷ মোট। যেমন একজনের বিক্রি C2-এ আর মোট বিক্রি C20-এ থাকলে: <code>=C2/$C$20</code> — তারপর ঘরটাকে Percent format দিন। ডলার চিহ্নের কারণ কাল, দিন ৫-এ বুঝবেন।</div>
+<div class="task"><b>আজকের কাজ</b>
+১০ জন ছাত্রের ৩টা বিষয়ের নম্বর দিয়ে টেবিল বানান (Name, Bangla, English, Math)। এখন যোগ করুন: <strong>Total</strong> কলাম (SUM), <strong>Average</strong> কলাম (AVERAGE)। টেবিলের নিচে আলাদাভাবে বের করুন — সর্বোচ্চ নম্বর (MAX), সর্বনিম্ন (MIN), মোট ছাত্র (COUNTA), আর ক্লাসের সার্বিক গড়।</div>`},
+
+  {n:5,t:"Cell Reference — Relative, Absolute ($) ও Mixed",g:"অনেকে এখানেই আটকে যায়। আজ ডলার চিহ্নের রহস্য পুরো পরিষ্কার হবে।",
+  html:`
+<h5>সমস্যাটা আগে দেখুন</h5>
+<p>D2-এ লিখলেন <code>=B2*C2</code>। এবার সেটা নিচে টেনে D3-এ নিলে সেটা নিজে বদলে <code>=B3*C3</code> হয়ে যায়। <strong>এটা দারুণ ব্যাপার</strong> — একবার লিখে ১০০০ সারিতে টেনে দিলেই হয়ে যায়।</p>
+<p>কিন্তু যদি সবগুলোকে <strong>একই একটা ঘর</strong> দিয়ে গুণ করতে চান — যেমন সবার উপর একই ১৫% VAT? তখন টানলে ফর্মুলা VAT-এর ঘর ছেড়ে অন্য দিকে সরে যাবে, আর সব হিসাব ভুল হবে। সমাধান = ডলার চিহ্ন।</p>
+
+<h5>তিন ধরনের Reference</h5>
+<table>
+<tr><th>লেখা</th><th>নাম</th><th>টানলে কী হয়</th><th>কখন লাগে</th></tr>
+<tr><td><code>B2</code></td><td>Relative</td><td>সারি ও কলাম দুটোই বদলায়</td><td>সারি ধরে ধরে হিসাব (সবচেয়ে বেশি এটাই)</td></tr>
+<tr><td><code>$B$2</code></td><td>Absolute</td><td>কিছুই বদলায় না, একদম আটকানো</td><td>VAT rate, ডলার রেট, মোট যোগফল</td></tr>
+<tr><td><code>B$2</code></td><td>Mixed</td><td>শুধু সারি আটকানো, কলাম চলে</td><td>উপরের হেডার সারিকে ধরে রাখা</td></tr>
+<tr><td><code>$B2</code></td><td>Mixed</td><td>শুধু কলাম আটকানো, সারি চলে</td><td>বাঁ দিকের কলামকে ধরে রাখা</td></tr>
+</table>
+<div class="note"><b>শর্টকাট</b>
+হাতে <code>$</code> টাইপ করতে হবে না। ফর্মুলায় Reference-এর উপর কার্সর রেখে <kbd>F4</kbd> চাপুন। বারবার চাপলে চক্রাকারে ঘুরবে: <code>B2 → $B$2 → B$2 → $B2 → B2</code></div>
+
+<h5>হাতে-কলমে করে দেখুন</h5>
+<ol class="steps">
+<li>E1-এ লিখুন <code>15%</code> (এটা আমাদের VAT rate)</li>
+<li>A2:A6-এ ৫টা পণ্যের নাম, B2:B6-এ দাম লিখুন</li>
+<li>C2-এ লিখুন <code>=B2*$E$1</code> — মানে "এই সারির দাম × সেই আটকানো VAT ঘর"</li>
+<li>C2 থেকে C6 পর্যন্ত টানুন। প্রতিটা ঘরে ঢুকে দেখুন — <code>B</code> বদলেছে কিন্তু <code>$E$1</code> অটুট আছে</li>
+<li>এবার পরীক্ষা: E1-এ ১৫% বদলে ২০% করুন। পাঁচটা হিসাব এক সেকেন্ডে বদলে গেল। <strong>এটাই স্প্রেডশিটের আসল শক্তি।</strong></li>
+</ol>
+
+<h5>নামতার ঘর — Mixed Reference-এর ক্লাসিক পরীক্ষা</h5>
+<p>একটা ফর্মুলা দিয়ে ১০×১০ নামতা বানানো যায়। B1:K1-এ ১–১০ আর A2:A11-এ ১–১০ লিখে B2-এ:</p>
+<div class="fx"><code>=$A2*B$1</code></div>
+<p>এবার B2 থেকে ডানে এবং নিচে — পুরো ব্লক জুড়ে টানুন। <code>$A2</code> সবসময় বাঁ কলাম দেখবে, <code>B$1</code> সবসময় উপরের সারি দেখবে। এই একটা ফর্মুলা ১০০ ঘর ভরে দেবে। এটা করতে পারলে Reference আপনার শেখা হয়ে গেছে।</p>
+<div class="warn"><b>#REF! এরর মানে কী</b>
+ফর্মুলা যে ঘর খুঁজছে সেটা আর নেই — সাধারণত আপনি ওই সারি/কলাম মুছে ফেলেছেন। <code>#DIV/0!</code> মানে শূন্য দিয়ে ভাগ করার চেষ্টা। এই এররগুলো সুন্দরভাবে সামলানো শিখবেন দিন ৮-এ।</div>
+<div class="task"><b>আজকের কাজ</b>
+একটা <strong>ইনভয়েস</strong> বানান: Product, Qty, Unit Price, Subtotal, VAT, Total। VAT rate একটা আলাদা ঘরে (যেমন G1) রাখুন এবং সব সারিতে <code>$G$1</code> দিয়ে ব্যবহার করুন। তারপর ওই একটা ঘর বদলে দেখুন পুরো ইনভয়েস নিজে আপডেট হচ্ছে। বোনাস: ১০×১০ নামতার ঘরটা বানান।</div>`},
+
+  {n:6,t:"Sort ও Filter — হাজার সারিতে যা খুঁজছেন তা পাওয়া",g:"ডেটা সাজানো, শর্ত দিয়ে ছেঁকে নেওয়া, আর Filter View দিয়ে অন্যের কাজ নষ্ট না করা।",
+  html:`
+<h5>Sort — সাজানো</h5>
+<div class="warn"><b>আগে এটা পড়ুন, নইলে ডেটা নষ্ট হবে</b>
+শুধু একটা কলাম সিলেক্ট করে Sort করলে <strong>সেই কলামটাই</strong> সাজবে, বাকি কলাম নিজের জায়গায় বসে থাকবে। ফলে রহিমের নামের পাশে করিমের বেতন চলে আসবে — আর আপনি বুঝতেও পারবেন না। <br><strong>সবসময়</strong> পুরো টেবিল সিলেক্ট করে বা কোনো ঘরে ক্লিক করে <em>Data → Sort range → Data has header row</em> ব্যবহার করুন।</div>
+<ol class="steps">
+<li>টেবিলের যেকোনো ঘরে ক্লিক করুন</li>
+<li><em>Data → Sort range → Advanced range sorting options</em></li>
+<li><strong>"Data has header row"</strong> টিক দিন — না দিলে হেডারও ডেটা ধরে সাজিয়ে ফেলবে</li>
+<li>কোন কলাম, A→Z (ছোট থেকে বড়) না Z→A বাছুন</li>
+<li>একাধিক শর্ত চাইলে <em>Add another sort column</em> — যেমন আগে Department অনুযায়ী, তার ভেতরে Salary বেশি থেকে কম</li>
+</ol>
+
+<h5>Filter — শর্ত দিয়ে ছেঁকে নেওয়া</h5>
+<p>Filter ডেটা মুছে না, শুধু <strong>লুকিয়ে রাখে</strong>। শর্ত সরালেই সব ফিরে আসে।</p>
+<ol class="steps">
+<li>টেবিলে ক্লিক করে <em>Data → Create a filter</em> (বা <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>)</li>
+<li>হেডারে ছোট ফানেল আইকন আসবে — সেটায় ক্লিক করুন</li>
+<li><strong>Filter by values</strong> — চেকবক্স দিয়ে বাছাই, যেমন শুধু "Dhaka"</li>
+<li><strong>Filter by condition</strong> — যেমন "Greater than 50000", "Text contains", "Date is after"</li>
+<li>একসাথে একাধিক কলামে ফিল্টার দিলে সব শর্ত <strong>একসাথে</strong> মিলতে হবে (AND লজিক)</li>
+</ol>
+
+<h5>Filter View — Google Sheets-এর যে ফিচারটা Excel-এ নেই</h5>
+<p>সাধারণ Filter দিলে শিট খোলা <strong>সবাই</strong> সেই ফিল্টার দেখে। টিমে কাজ করলে এটা বিরক্তিকর। সমাধান: <em>Data → Create filter view</em>। এটা শুধু আপনার চোখে ফিল্টার করে, বাকিদের কিছু বদলায় না। নাম দিয়ে সেভ করে রাখা যায়, লিংকও শেয়ার করা যায়।</p>
+
+<h5>Slicer — এক ক্লিকে ফিল্টার</h5>
+<p>Chart বা ড্যাশবোর্ডের পাশে সুন্দর ড্রপডাউন বোতাম চাইলে: <em>Data → Add a slicer</em>। কলাম বাছুন, ব্যস। দিন ২০-এর ড্যাশবোর্ড প্রজেক্টে এটা লাগবে।</p>
+<div class="note"><b>বাস্তব কাজের ধারা</b>
+১) ডেটা এসেছে → ২) Filter দিয়ে দেখুন কোথায় ভুল/খালি ঘর আছে → ৩) ঠিক করুন → ৪) Sort করে সাজান → ৫) তারপর রিপোর্ট বানান। ডেটা পরিষ্কার না করে সোজা রিপোর্টে চলে গেলে ভুল রিপোর্ট বানাবেন।</div>
+<div class="task"><b>আজকের কাজ</b>
+৩০ জন কর্মীর একটা তালিকা বানান — Name, Department (৪টা ভিন্ন), District (৩টা ভিন্ন), Salary, JoinDate। এখন করুন: <br>১) Department অনুযায়ী সাজান, ভেতরে Salary বেশি থেকে কম <br>২) Filter দিয়ে শুধু ঢাকার কর্মী দেখান <br>৩) Filter by condition দিয়ে যাদের বেতন ৪০,০০০-এর বেশি তাদের দেখান <br>৪) একটা Filter View সেভ করুন "High Salary" নামে</div>`},
+
+  {n:7,t:"Text Function — নোংরা ডেটা পরিষ্কার করা",g:"নাম ভাঙা, জোড়া দেওয়া, বাড়তি স্পেস সরানো — বাস্তব কাজের ৩০% এটাই।",
+  html:`
+<h5>কেন এটা শিখতেই হবে</h5>
+<p>বাস্তবে ডেটা কখনো পরিষ্কার আসে না। কারো নামে দুইটা স্পেস, কারো নামে বড়-ছোট হাতের অক্ষর মেশানো, ফোন নম্বরের সাথে দেশের কোড লাগানো। Text function দিয়ে এগুলো কয়েক সেকেন্ডে ঠিক করা যায় — হাতে করলে কয়েক ঘণ্টা।</p>
+
+<h5>জোড়া দেওয়া</h5>
+<div class="fx"><code>=A2&" "&B2                    সবচেয়ে সহজ — & দিয়ে জোড়া
+=CONCATENATE(A2," ",B2)       একই কাজ, লম্বা নাম
+=TEXTJOIN(", ",TRUE,A2:D2)    অনেক ঘর একসাথে, খালি ঘর বাদ দিয়ে</code></div>
+<p><code>TEXTJOIN</code>-এর মাঝের <code>TRUE</code> মানে "খালি ঘর থাকলে এড়িয়ে যাও" — ঠিকানা জোড়া দিতে খুব কাজে লাগে।</p>
+
+<h5>ভাঙা ও কাটা</h5>
+<table>
+<tr><th>ফাংশন</th><th>কাজ</th><th>উদাহরণ</th></tr>
+<tr><td><code>LEFT</code></td><td>বাঁ দিক থেকে কয়েকটা অক্ষর</td><td><code>=LEFT(A2,3)</code></td></tr>
+<tr><td><code>RIGHT</code></td><td>ডান দিক থেকে</td><td><code>=RIGHT(A2,4)</code></td></tr>
+<tr><td><code>MID</code></td><td>মাঝ থেকে — কোথা থেকে, কতটা</td><td><code>=MID(A2,5,3)</code></td></tr>
+<tr><td><code>LEN</code></td><td>মোট কত অক্ষর</td><td><code>=LEN(A2)</code></td></tr>
+<tr><td><code>FIND</code></td><td>কোনো অক্ষর কত নম্বরে আছে (বড়-ছোট হাতের হিসাব রাখে)</td><td><code>=FIND("@",A2)</code></td></tr>
+<tr><td><code>SEARCH</code></td><td>একই, কিন্তু বড়-ছোট হাত গোনে না</td><td><code>=SEARCH("dhaka",A2)</code></td></tr>
+</table>
+<p><strong>বাস্তব উদাহরণ</strong> — ইমেইল থেকে ইউজারনেম বের করা:</p>
+<div class="fx"><code>=LEFT(A2, FIND("@",A2)-1)</code></div>
+<p>ভেতরের <code>FIND</code> বলে দিচ্ছে @ কত নম্বর অক্ষরে, তার থেকে ১ বাদ দিয়ে <code>LEFT</code> ততটুকু কেটে নিচ্ছে।</p>
+
+<h5>পরিষ্কার করা</h5>
+<div class="fx"><code>=TRIM(A2)      সামনের-পিছনের ও বাড়তি স্পেস সরায়
+=UPPER(A2)     সব বড় হাতের অক্ষর
+=LOWER(A2)     সব ছোট হাতের
+=PROPER(A2)    প্রতি শব্দের প্রথম অক্ষর বড় — নামের জন্য পারফেক্ট
+=CLEAN(A2)     লুকানো/অদৃশ্য ক্যারেক্টার সরায়</code></div>
+<div class="warn"><b>VLOOKUP কাজ করছে না? ৯০% ক্ষেত্রে এটাই কারণ</b>
+<code>"Rahim"</code> আর <code>"Rahim "</code> (শেষে একটা স্পেস) — চোখে একই, কম্পিউটারের কাছে সম্পূর্ণ ভিন্ন। তাই <strong>যেকোনো বাইরের ডেটা পাওয়ার সাথে সাথে প্রথম কাজ</strong>: <code>=TRIM(A2)</code> দিয়ে একটা পরিষ্কার কলাম বানানো।</div>
+
+<h5>বদলানো ও ভাঙা</h5>
+<div class="fx"><code>=SUBSTITUTE(A2,"-","")           ড্যাশ সরিয়ে দেয় (ফোন নম্বরে কাজে লাগে)
+=SUBSTITUTE(A2,"Ltd","Limited")  একটা শব্দকে আরেকটা বানায়
+=SPLIT(A2," ")                   স্পেস দেখলেই ভেঙে আলাদা কলামে বসায়
+=REPT("★",4)                     ★★★★ — রেটিং দেখাতে মজার ট্রিক</code></div>
+<p>মেনু থেকেও ভাঙা যায়: <em>Data → Split text to columns</em> — একবারে, ফর্মুলা ছাড়া।</p>
+<div class="task"><b>আজকের কাজ</b>
+A কলামে ১০টা নাম এমনভাবে লিখুন যাতে সমস্যা থাকে — যেমন <code>  rahim  UDDIN </code>, <code>KARIM ali</code>। এখন <br>১) TRIM + PROPER দিয়ে পরিষ্কার নামের কলাম বানান <br>২) SPLIT দিয়ে First Name ও Last Name আলাদা করুন <br>৩) ইমেইল বানান এই ফর্মুলায়: ছোট হাতের প্রথম নাম + ডট + ছোট হাতের শেষ নাম + <code>@company.com</code> <br>৪) LEN দিয়ে দেখান প্রতিটা নামে কত অক্ষর</div>`},
+
+  {n:8,t:"IF ও লজিক — শিটকে সিদ্ধান্ত নিতে শেখানো",g:"শর্ত অনুযায়ী ভিন্ন ফলাফল। Pass/Fail, Grade, Status — সব এখান থেকে।",
+  html:`
+<h5>IF-এর গঠন</h5>
+<div class="fx"><code>=IF(শর্ত, সত্য হলে যা দেখাবে, মিথ্যা হলে যা দেখাবে)
+
+=IF(B2>=40, "Pass", "Fail")</code></div>
+<p>তিনটা অংশ, কমা দিয়ে আলাদা। লেখা ফেরত দিতে চাইলে সেটা অবশ্যই <strong>ডাবল কোটেশনে</strong> রাখুন। সংখ্যা ফেরত দিলে কোটেশন লাগবে না।</p>
+<table>
+<tr><th>চিহ্ন</th><th>মানে</th></tr>
+<tr><td><code>=</code></td><td>সমান</td></tr>
+<tr><td><code>&lt;&gt;</code></td><td>সমান নয়</td></tr>
+<tr><td><code>&gt;</code> <code>&lt;</code></td><td>বড় / ছোট</td></tr>
+<tr><td><code>&gt;=</code> <code>&lt;=</code></td><td>বড় বা সমান / ছোট বা সমান</td></tr>
+</table>
+
+<h5>Nested IF — একের ভেতরে আরেক</h5>
+<p>দুইটার বেশি ফলাফল দরকার হলে IF-এর ভেতরে IF বসান। গ্রেড বের করা:</p>
+<div class="fx"><code>=IF(B2>=80,"A+", IF(B2>=70,"A", IF(B2>=60,"A-", IF(B2>=50,"B", IF(B2>=40,"C","F")))))</code></div>
+<div class="warn"><b>ক্রম উল্টো করলে সব ভুল হবে</b>
+সবসময় <strong>সবচেয়ে কঠিন শর্ত আগে</strong> লিখুন। যদি <code>IF(B2>=40,"C",...)</code> আগে লিখেন, তাহলে ৯৫ নম্বরও ৪০-এর বেশি — তাই সে "C" পেয়ে যাবে, ফর্মুলা আর এগোবেই না। IF উপর থেকে নিচে পড়ে আর <strong>প্রথম যেটা মেলে সেখানেই থেমে যায়</strong>।</div>
+
+<h5>IFS — অনেক শর্তের পরিষ্কার উপায়</h5>
+<div class="fx"><code>=IFS(B2>=80,"A+", B2>=70,"A", B2>=60,"A-", B2>=50,"B", B2>=40,"C", TRUE,"F")</code></div>
+<p>জোড়ায় জোড়ায় লেখা: শর্ত, ফলাফল, শর্ত, ফলাফল... শেষে <code>TRUE</code> মানে "কিছুই না মিললে এটা"। অনেক বন্ধনী গোনার ঝামেলা নেই — Nested IF-এর চেয়ে ভালো।</p>
+
+<h5>AND, OR, NOT — একাধিক শর্ত জোড়া</h5>
+<div class="fx"><code>=IF(AND(B2>=40, C2>=40), "Pass", "Fail")     দুটোই মিলতে হবে
+=IF(OR(B2>=90, C2>=90), "Star", "Normal")     যেকোনো একটা মিললেই হবে
+=IF(NOT(D2="Resigned"), "Active", "Inactive") উল্টো শর্ত</code></div>
+
+<h5>এরর সামলানো — IFERROR</h5>
+<p>ভাগ করতে গিয়ে <code>#DIV/0!</code> বা VLOOKUP-এ <code>#N/A</code> এলে রিপোর্ট বিশ্রী দেখায়। মুড়ে দিন:</p>
+<div class="fx"><code>=IFERROR(B2/C2, 0)                  এরর হলে ০ দেখাবে
+=IFERROR(B2/C2, "")                 এরর হলে ঘর খালি দেখাবে
+=IFERROR(VLOOKUP(...), "পাওয়া যায়নি")</code></div>
+<div class="note"><b>ফাঁকা ঘর সামলানোর সঠিক নিয়ম</b>
+<code>=IF(B2="", "", B2*C2)</code> — মানে "B2 খালি থাকলে কিছু দেখাবে না, নইলে গুণ করবে"। এটা না দিলে খালি সারিতেও ০ দেখাবে আর রিপোর্ট নোংরা লাগবে।</div>
+<div class="task"><b>আজকের কাজ</b>
+আপনার Day 4-এর ছাত্রদের শিটে ফিরে যান এবং যোগ করুন: <br>১) <strong>Result</strong> কলাম — তিন বিষয়েই ৪০+ পেলে Pass, নইলে Fail (AND ব্যবহার করুন) <br>২) <strong>Grade</strong> কলাম — Average অনুযায়ী IFS দিয়ে A+ থেকে F <br>৩) <strong>Remark</strong> কলাম — Average ৮০+ হলে "Excellent", ৬০+ হলে "Good", ৪০+ হলে "Need Improvement", নইলে "Must Retake" <br>৪) একটা ঘরে ইচ্ছা করে <code>=B2/0</code> লিখে IFERROR দিয়ে সুন্দর মেসেজ দেখান</div>`},
+
+  {n:9,t:"শর্তসহ গণনা — COUNTIF, SUMIF, SUMIFS",g:"“ঢাকার কতজন?”, “জুলাই মাসে কত বিক্রি?” — রিপোর্টের আসল প্রশ্নগুলোর উত্তর।",
+  html:`
+<h5>ধারণাটা এক লাইনে</h5>
+<p>সাধারণ <code>SUM</code> সব যোগ করে। <code>SUMIF</code> শুধু <strong>যেগুলো শর্ত মেলে</strong> সেগুলো যোগ করে। প্রতিটা রিপোর্টে এই জিনিস লাগে।</p>
+
+<h5>COUNTIF ও COUNTIFS — গোনা</h5>
+<div class="fx"><code>=COUNTIF(range, শর্ত)
+
+=COUNTIF(C2:C100, "Dhaka")           ঢাকার কতজন
+=COUNTIF(D2:D100, ">50000")          ৫০ হাজারের বেশি বেতন কতজনের
+=COUNTIF(A2:A100, "*Rahman*")        নামে Rahman আছে কতজনের
+=COUNTIF(B2:B100, B2)>1              এই নামটা একবারের বেশি আছে কি না
+
+=COUNTIFS(C2:C100,"Dhaka", B2:B100,"IT")    ঢাকার IT-তে কতজন</code></div>
+<p>শর্তে <code>*</code> মানে "যেকোনো কিছু থাকতে পারে" আর <code>?</code> মানে "ঠিক একটা অক্ষর"।</p>
+
+<h5>SUMIF ও SUMIFS — যোগ করা</h5>
+<div class="warn"><b>ক্রম উল্টো — এটাই সবচেয়ে বড় বিভ্রান্তি</b>
+<code>SUMIF</code>-এ Range আগে, যোগের কলাম শেষে।<br>
+<code>SUMIFS</code>-এ যোগের কলাম <strong>একদম আগে</strong>, তারপর শর্ত।<br>
+এটা মনে না থাকলে ফর্মুলা ভুল ফল দেবে কোনো এরর ছাড়াই — যা আরও বিপজ্জনক।</div>
+<div class="fx"><code>=SUMIF(কোথায় খুঁজবে, কী খুঁজবে, কোনটা যোগ করবে)
+=SUMIF(C2:C100, "Dhaka", D2:D100)
+
+=SUMIFS(কোনটা যোগ করবে, খোঁজার কলাম1, শর্ত1, খোঁজার কলাম2, শর্ত2)
+=SUMIFS(D2:D100, C2:C100,"Dhaka", B2:B100,"IT")</code></div>
+<p><strong>তারিখের সীমা দিয়ে যোগ</strong> — মাসিক রিপোর্টের প্রাণ:</p>
+<div class="fx"><code>=SUMIFS(E2:E500, A2:A500,">="&DATE(2026,7,1), A2:A500,"<="&DATE(2026,7,31))</code></div>
+<p>খেয়াল করুন: <code>"&gt;="</code> কোটেশনের ভেতরে, আর <code>&amp;</code> দিয়ে তারিখটা জোড়া দেওয়া হয়েছে। ঘরের রেফারেন্স দিলেও একই নিয়ম: <code>"&gt;="&amp;G1</code></p>
+
+<h5>বাকিরা — একই ধাঁচে</h5>
+<div class="fx"><code>=AVERAGEIF(C2:C100,"Dhaka",D2:D100)      শর্তসহ গড়
+=AVERAGEIFS(D2:D100, C2:C100,"Dhaka", B2:B100,"IT")
+=MAXIFS(D2:D100, C2:C100,"Dhaka")        শর্তসহ সর্বোচ্চ
+=MINIFS(D2:D100, C2:C100,"Dhaka")        শর্তসহ সর্বনিম্ন
+=SUMPRODUCT(B2:B10, C2:C10)              দুই কলাম জোড়ায় জোড়ায় গুণ করে যোগ</code></div>
+<p><code>SUMPRODUCT</code>-টা দুর্দান্ত — Qty ও Price কলাম থাকলে আলাদা Subtotal কলাম বানানো ছাড়াই মোট বিল বের হয়ে যায়।</p>
+<div class="note"><b>শর্তকে ঘর থেকে নিন, হাতে লিখবেন না</b>
+<code>=COUNTIF(C:C,"Dhaka")</code>-এর চেয়ে <code>=COUNTIF(C:C,G1)</code> হাজার গুণ ভালো — যেখানে G1-এ শহরের নাম লেখা। কারণ G1 বদলালেই পুরো রিপোর্ট বদলে যায়, ফর্মুলা ছুঁতে হয় না। এটাই ড্যাশবোর্ড বানানোর মূল কৌশল।</div>
+<div class="task"><b>আজকের কাজ</b>
+Day 6-এর কর্মীর তালিকাটা ৫০ সারিতে বাড়ান, একটা <strong>Salary</strong> ও একটা <strong>JoinDate</strong> কলাম রাখুন। এবার পাশে একটা ছোট Summary টেবিল বানান যা দেখাবে: <br>• প্রতিটা Department-এ কতজন (COUNTIF) <br>• প্রতিটা Department-এর মোট বেতন (SUMIF) <br>• প্রতিটা Department-এর গড় বেতন (AVERAGEIF) <br>• ঢাকার IT বিভাগে কতজন (COUNTIFS) <br>• ২০২৬ সালে যারা জয়েন করেছে তাদের মোট বেতন (SUMIFS + DATE)</div>`},
+
+  {n:10,t:"প্রজেক্ট ১ — Attendance ও Salary Sheet",g:"প্রথম ৯ দিনের সবকিছু এক ফাইলে জোড়া দেওয়া। এটাই আপনার প্রথম আসল কাজ।",
+  html:`
+<h5>কী বানাবেন</h5>
+<p>একটা সম্পূর্ণ মাসিক হাজিরা ও বেতন শিট — ঠিক যেমনটা ছোট অফিসে ব্যবহার হয়। কোনো নতুন ফাংশন নেই। শুধু যা শিখেছেন তা কাজে লাগানো। <strong>প্রথম চেষ্টায় আটকে যাবেন, এটাই স্বাভাবিক</strong> — আটকালে আগের দিনগুলোতে ফিরে যান।</p>
+
+<h5>Sheet 1: Employees (মূল তথ্য)</h5>
+<table>
+<tr><th>কলাম</th><th>কী থাকবে</th></tr>
+<tr><td>EmpID</td><td>EMP-001 থেকে শুরু, Fill Handle দিয়ে ২০ জন (দিন ২)</td></tr>
+<tr><td>Name</td><td>PROPER দিয়ে পরিষ্কার করা নাম (দিন ৭)</td></tr>
+<tr><td>Department</td><td>IT, HR, Sales, Accounts</td></tr>
+<tr><td>JoinDate</td><td>YYYY-MM-DD ফরম্যাটে (দিন ৩)</td></tr>
+<tr><td>BasicSalary</td><td>৳ currency format দেওয়া সংখ্যা</td></tr>
+</table>
+
+<h5>Sheet 2: Attendance (হাজিরা)</h5>
+<p>বাঁ দিকে EmpID ও Name, উপরে তারিখ ১ থেকে ৩০ (Fill Handle দিয়ে)। প্রতিটা ঘরে লিখুন <code>P</code> (Present), <code>A</code> (Absent), বা <code>L</code> (Leave)।</p>
+<p>ডান দিকে গণনার কলাম:</p>
+<div class="fx"><code>=COUNTIF(C2:AF2,"P")     উপস্থিত কত দিন
+=COUNTIF(C2:AF2,"A")     অনুপস্থিত কত দিন
+=COUNTIF(C2:AF2,"L")     ছুটি কত দিন
+=COUNTIF(C2:AF2,"P")/30  উপস্থিতির হার → Percent format দিন</code></div>
+
+<h5>Sheet 3: Salary (হিসাব)</h5>
+<p>উপরে একটা Settings ব্লক বানান আর সব ফর্মুলায় <code>$</code> দিয়ে ওটাকেই ব্যবহার করুন (দিন ৫):</p>
+<table>
+<tr><th>ঘর</th><th>মান</th></tr>
+<tr><td>H1</td><td>House Rent — 40%</td></tr>
+<tr><td>H2</td><td>Medical — 1500</td></tr>
+<tr><td>H3</td><td>এক দিনের অনুপস্থিতিতে কাটা — 1 দিনের বেতন</td></tr>
+</table>
+<div class="fx"><code>House Rent  =Employees!E2*$H$1
+Medical     =$H$2
+Gross       =Employees!E2+C2+D2
+Per Day     =Employees!E2/30
+Deduction   =PerDay * Attendance!AH2          (AH2 = Absent দিনের সংখ্যা)
+Net Salary  =Gross-Deduction
+Status      =IF(Attendance!AI2>=0.9,"Bonus Eligible","No Bonus")</code></div>
+<p>অন্য শিটের ঘর ডাকতে হলে লিখুন <code>SheetName!CellRef</code> — এভাবে: <code>Employees!E2</code>। শিটের নামে স্পেস থাকলে সিঙ্গেল কোটে: <code>'My Sheet'!E2</code></p>
+
+<h5>Sheet 4: Summary (রিপোর্ট)</h5>
+<div class="fx"><code>মোট কর্মী            =COUNTA(Employees!A2:A21)
+মোট বেতন খরচ        =SUM(Salary!G2:G21)
+গড় বেতন             =AVERAGE(Salary!G2:G21)
+সর্বোচ্চ বেতন         =MAX(Salary!G2:G21)
+IT বিভাগে কতজন      =COUNTIF(Employees!C2:C21,"IT")
+IT বিভাগের মোট বেতন  =SUMIF(Employees!C2:C21,"IT",Salary!G2:G21)</code></div>
+
+<h5>শেষ করার আগে চেকলিস্ট</h5>
+<ul>
+<li>হেডার Bold ও Freeze করা আছে (দিন ৩)</li>
+<li>সব টাকার ঘরে ৳ format, সব তারিখে Date format</li>
+<li>Settings-এর ৪০% বদলে ৫০% করলে পুরো শিট নিজে আপডেট হয় — <strong>এটা অবশ্যই টেস্ট করুন</strong></li>
+<li>সব ভাগের ফর্মুলা <code>IFERROR</code> দিয়ে মোড়ানো (দিন ৮)</li>
+<li>Salary শিটে Filter আছে, Net Salary অনুযায়ী Sort করা যায় (দিন ৬)</li>
+</ul>
+<div class="task"><b>আজকের কাজ</b>
+পুরো ৪ শিটের ফাইলটা বানান। শেষ করে ফাইলটার নাম দিন <strong>"Project 1 — Payroll System"</strong> এবং আলাদা একটা ফোল্ডারে রাখুন। ৩০ দিন শেষে এই ফাইলটা আপনার পোর্টফোলিও হবে — ইন্টারভিউতে দেখাতে পারবেন। <br><br><strong>নিজেকে প্রশ্ন করুন:</strong> কোন অংশটা করতে সবচেয়ে বেশি আটকেছেন? সেই দিনটা আবার পড়ুন। আটকানো জায়গাটাই আপনার দুর্বলতা — এখনই সারিয়ে নিন, পরে আরও কঠিন লাগবে।</div>`}
+  ]
+},
+{
+  pn:"Phase 2 · দিন ১১–২০",
+  title:"Google Sheets — মধ্যম স্তর (Intermediate)",
+  desc:"Lookup, Pivot Table, Chart আর Google Sheets-এর নিজস্ব বিশেষ ক্ষমতা। এই ১০ দিন শেষে আপনি রিপোর্ট বানাতে পারবেন।",
+  days:[
+  {n:11,t:"তারিখ ও সময়ের ফাংশন",g:"বয়স, চাকরির সময়কাল, ডেডলাইন, কাজের দিন — সব হিসাব।",
+  html:`
+<h5>মূল কথা আবার</h5>
+<p>তারিখ ভেতরে একটা সংখ্যা। <code>2026-07-28</code> মানে ভেতরে হয়তো <code>46231</code>। তাই তারিখ যোগ-বিয়োগ করা যায়। <code>+7</code> করলে এক সপ্তাহ পরের তারিখ পাবেন।</p>
+
+<h5>এখনকার তারিখ</h5>
+<div class="fx"><code>=TODAY()    আজকের তারিখ — প্রতিদিন নিজে বদলায়
+=NOW()      তারিখ + সময়
+=TODAY()+7  আজ থেকে ৭ দিন পরে</code></div>
+<div class="warn"><b>খেয়াল রাখুন</b>
+<code>TODAY()</code> প্রতিদিন বদলায়। তাই "কবে এন্ট্রি করা হয়েছিল" সেটা স্থায়ীভাবে রাখতে চাইলে <code>TODAY()</code> লিখে <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd> দিয়ে শুধু value পেস্ট করুন — তখন তারিখটা আটকে যাবে।</div>
+
+<h5>তারিখ ভাঙা ও বানানো</h5>
+<div class="fx"><code>=DAY(A2)              তারিখের দিন (১–৩১)
+=MONTH(A2)            মাস (১–১২)
+=YEAR(A2)             বছর
+=WEEKDAY(A2)          সপ্তাহের কোন দিন (১=রবি ... ৭=শনি)
+=WEEKDAY(A2,2)        ১=সোম ... ৭=রবি
+=TEXT(A2,"mmmm")      মাসের পুরো নাম — July
+=TEXT(A2,"ddd")       দিনের সংক্ষেপ — Tue
+=DATE(2026,7,28)      আলাদা তিনটা সংখ্যা দিয়ে তারিখ বানানো</code></div>
+<p><code>TEXT</code> ফাংশনটা দুর্দান্ত — Pivot বা রিপোর্টে মাসের নাম দেখাতে এটাই ব্যবহার করবেন:</p>
+<div class="fx"><code>=TEXT(A2,"mmm-yyyy")    →  Jul-2026</code></div>
+
+<h5>পার্থক্য বের করা</h5>
+<div class="fx"><code>=B2-A2                        কত দিন
+=DATEDIF(A2,B2,"Y")           পুরো কত বছর
+=DATEDIF(A2,B2,"M")           পুরো কত মাস
+=DATEDIF(A2,B2,"D")           কত দিন
+=DATEDIF(A2,TODAY(),"Y")      বয়স / চাকরির বছর</code></div>
+<p>চাকরির সময়কাল সুন্দরভাবে দেখাতে:</p>
+<div class="fx"><code>=DATEDIF(A2,TODAY(),"Y")&" বছর "&DATEDIF(A2,TODAY(),"YM")&" মাস"</code></div>
+<p>এখানে <code>"YM"</code> মানে "পুরো বছর বাদ দিয়ে বাকি মাসগুলো"।</p>
+
+<h5>কাজের দিন ও ডেডলাইন</h5>
+<div class="fx"><code>=NETWORKDAYS(A2,B2)           শুক্র-শনি বাদ দিয়ে কত কাজের দিন
+=WORKDAY(A2,10)               ১০ কাজের দিন পরের তারিখ
+=EOMONTH(A2,0)                এই মাসের শেষ তারিখ
+=EOMONTH(A2,-1)+1             এই মাসের প্রথম তারিখ
+=EOMONTH(A2,1)                পরের মাসের শেষ তারিখ</code></div>
+<div class="note"><b>বাংলাদেশের সাপ্তাহিক ছুটি</b>
+<code>NETWORKDAYS</code> ডিফল্টে শনি-রবি ছুটি ধরে (পশ্চিমা নিয়ম)। বাংলাদেশে শুক্র-শনি ছুটি হলে <code>NETWORKDAYS.INTL</code> ব্যবহার করুন — <code>=NETWORKDAYS.INTL(A2,B2,7)</code> যেখানে <code>7</code> মানে শুক্র-শনি ছুটি।</div>
+
+<h5>দুইটা কাজের ফর্মুলা</h5>
+<p><strong>ডেডলাইনের সতর্কবার্তা:</strong></p>
+<div class="fx"><code>=IF(B2&lt;TODAY(),"⚠ পার হয়ে গেছে", IF(B2-TODAY()&lt;=3,"শেষ ৩ দিন","সময় আছে"))</code></div>
+<p><strong>জন্মদিন এই মাসে কি না:</strong></p>
+<div class="fx"><code>=IF(MONTH(A2)=MONTH(TODAY()),"এই মাসে জন্মদিন","")</code></div>
+<div class="task"><b>আজকের কাজ</b>
+একটা <strong>কর্মী রেকর্ড</strong> শিট বানান: Name, DOB, JoinDate, ContractEndDate। এখন যোগ করুন — <br>১) Age (DATEDIF দিয়ে বছর) <br>২) Service Period ("X বছর Y মাস" ফরম্যাটে) <br>৩) Join হওয়া মাসের নাম (TEXT দিয়ে) <br>৪) Contract শেষ হতে আর কত দিন <br>৫) Status কলাম — চুক্তি শেষ হয়ে গেলে "Expired", ৩০ দিনের কম থাকলে "Renew Soon", নইলে "Active"</div>`},
+
+  {n:12,t:"VLOOKUP — এক টেবিল থেকে অন্য টেবিলে তথ্য আনা",g:"সবচেয়ে বেশি চাওয়া স্কিল। ইন্টারভিউতে এটা প্রায় নিশ্চিত জিজ্ঞেস করবে।",
+  html:`
+<h5>সমস্যাটা</h5>
+<p>আপনার কাছে দুইটা শিট। একটায় ২০০ জন কর্মীর EmpID ও নাম-বিভাগ-বেতন। আরেকটায় শুধু ৫০ জনের EmpID আছে, তাদের নাম আনতে হবে। হাতে খুঁজে খুঁজে কপি করবেন? না। <code>VLOOKUP</code> এক সেকেন্ডে করে দেবে।</p>
+
+<h5>গঠন — ৪টা অংশ</h5>
+<div class="fx"><code>=VLOOKUP(কী খুঁজব, কোন টেবিলে খুঁজব, কত নম্বর কলাম আনব, FALSE)
+
+=VLOOKUP(A2, Employees!$A$2:$E$200, 3, FALSE)</code></div>
+<table>
+<tr><th>অংশ</th><th>মানে</th></tr>
+<tr><td><strong>১. search_key</strong></td><td>যেটা খুঁজছেন — সাধারণত ID বা নাম</td></tr>
+<tr><td><strong>২. range</strong></td><td>যে টেবিলে খুঁজবে। <code>$</code> দিয়ে আটকান, নইলে টানলে সরে যাবে</td></tr>
+<tr><td><strong>৩. index</strong></td><td>Range-এর <strong>প্রথম কলাম থেকে গুনে</strong> কত নম্বর কলামের মান চান</td></tr>
+<tr><td><strong>৪. is_sorted</strong></td><td>প্রায় সবসময় <code>FALSE</code> — মানে ঠিক হুবহু মিল চাই</td></tr>
+</table>
+<div class="warn"><b>VLOOKUP-এর তিনটা কঠিন নিয়ম</b>
+<strong>১)</strong> যেটা খুঁজছেন সেটা টেবিলের <strong>একদম প্রথম কলামে</strong> থাকতেই হবে। EmpID যদি C কলামে থাকে, তাহলে Range শুরু করতে হবে C থেকে।<br>
+<strong>২)</strong> কলাম নম্বর Range-এর ভেতর থেকে গোনা হয়, শিটের A/B/C থেকে নয়। Range <code>C2:G200</code> হলে C=১, D=২, E=৩।<br>
+<strong>৩)</strong> শেষে <code>FALSE</code> না দিলে ভুল উত্তর আসতে পারে — কোনো এরর ছাড়াই। তাই সবসময় <code>FALSE</code> লিখুন।</div>
+
+<h5>এরর সামলানো</h5>
+<div class="fx"><code>=IFERROR(VLOOKUP(A2,Employees!$A$2:$E$200,3,FALSE),"পাওয়া যায়নি")</code></div>
+<p><code>#N/A</code> মানে খুঁজে পায়নি। কেন পায়নি — সাধারণত এই কারণগুলোতে:</p>
+<ul>
+<li>বাড়তি স্পেস → <code>=VLOOKUP(TRIM(A2), ...)</code> দিয়ে ঠিক করুন</li>
+<li>একদিকে সংখ্যা, অন্যদিকে সংখ্যা-দেখতে-লেখা → এক ঘরে <code>=ISNUMBER(A2)</code> দিয়ে চেক করুন</li>
+<li>Range-এ ওই সারিটা আসলেই নেই</li>
+</ul>
+
+<h5>একবারে অনেক কলাম আনা</h5>
+<p>প্রতিটা কলামের জন্য আলাদা ফর্মুলা লেখার বদলে হেডার ব্যবহার করুন:</p>
+<div class="fx"><code>=VLOOKUP($A2, Employees!$A$2:$E$200, MATCH(B$1,Employees!$A$1:$E$1,0), FALSE)</code></div>
+<p>এখানে <code>MATCH</code> নিজে বের করছে হেডারের নামটা কত নম্বর কলামে। এবার ডানে টানলেই বাকি কলাম চলে আসবে — <code>B$1</code> Mixed Reference (দিন ৫) কাজে লেগে গেল।</p>
+
+<h5>VLOOKUP-এর বড় সীমাবদ্ধতা</h5>
+<p>এটা <strong>শুধু ডান দিকে</strong> তাকাতে পারে। যদি ID ডান দিকে থাকে আর নাম বাঁ দিকে, VLOOKUP অচল। এর সমাধান কাল — INDEX+MATCH ও XLOOKUP।</p>
+<div class="note"><b>ইন্টারভিউ প্রশ্ন</b>
+"VLOOKUP আর HLOOKUP-এর পার্থক্য কী?" — উত্তর: VLOOKUP খাড়াভাবে (কলাম ধরে নিচে) খোঁজে, HLOOKUP আড়াআড়িভাবে (সারি ধরে ডানে) খোঁজে। বাস্তবে HLOOKUP প্রায় লাগে না, কারণ ডেটা প্রায় সবসময় খাড়াভাবে সাজানো থাকে।</div>
+<div class="task"><b>আজকের কাজ</b>
+দুইটা শিট বানান। <strong>Master</strong>-এ ৩০ জনের EmpID, Name, Department, Designation, BasicSalary। <strong>Monthly</strong>-তে শুধু ১৫টা EmpID লিখুন (এলোমেলো ক্রমে) এবং VLOOKUP দিয়ে Name, Department ও BasicSalary টেনে আনুন। তারপর ইচ্ছা করে একটা ভুল ID দিন (যেমন EMP-999) এবং IFERROR দিয়ে "ID ভুল" মেসেজ দেখান। <br><strong>চ্যালেঞ্জ:</strong> MATCH ব্যবহার করে একটাই ফর্মুলা লিখুন যা ডানে টানলেই তিনটা কলাম ভরে দেয়।</div>`},
+
+  {n:13,t:"INDEX + MATCH ও XLOOKUP — পেশাদার Lookup",g:"VLOOKUP-এর সব সীমা ভেঙে ফেলা। সিনিয়ররা এগুলোই ব্যবহার করে।",
+  html:`
+<h5>প্রথমে আলাদা করে বুঝুন</h5>
+<p><code>MATCH</code> বলে দেয় <strong>কত নম্বরে</strong> আছে। <code>INDEX</code> বলে দেয় <strong>কত নম্বরে কী</strong> আছে। দুটো জোড়া দিলে VLOOKUP-এর চেয়ে শক্তিশালী জিনিস হয়।</p>
+<div class="fx"><code>=MATCH("Rahim", A2:A100, 0)      →  Rahim তালিকার ৭ নম্বরে আছে (ধরুন)
+=INDEX(C2:C100, 7)               →  C কলামের ৭ নম্বর ঘরের মান</code></div>
+<p><code>MATCH</code>-এর শেষের <code>0</code> মানে হুবহু মিল। এটা বাদ দেবেন না।</p>
+
+<h5>জোড়া দিন</h5>
+<div class="fx"><code>=INDEX(যেটা আনতে চান, MATCH(যেটা খুঁজছেন, যেখানে খুঁজবেন, 0))
+
+=INDEX(C2:C100, MATCH(A2, B2:B100, 0))</code></div>
+<p>পড়ার নিয়ম — ভেতর থেকে বাইরে: "A2-কে B কলামে খোঁজো, কত নম্বরে পেলে সেটা নাও, তারপর C কলামের সেই নম্বর ঘরটা দাও।"</p>
+
+<h5>কেন এটা VLOOKUP-এর চেয়ে ভালো</h5>
+<table>
+<tr><th>বিষয়</th><th>VLOOKUP</th><th>INDEX+MATCH</th></tr>
+<tr><td>বাঁ দিকে তাকাতে পারে?</td><td>না</td><td><strong>হ্যাঁ</strong></td></tr>
+<tr><td>মাঝে নতুন কলাম যোগ করলে?</td><td>ভেঙে যায়</td><td><strong>ঠিক থাকে</strong></td></tr>
+<tr><td>বড় ফাইলে গতি</td><td>ধীর (পুরো টেবিল পড়ে)</td><td><strong>দ্রুত (শুধু ২ কলাম পড়ে)</strong></td></tr>
+<tr><td>শিখতে সহজ?</td><td><strong>হ্যাঁ</strong></td><td>একটু কঠিন</td></tr>
+</table>
+
+<h5>XLOOKUP — নতুন ও সবচেয়ে সহজ</h5>
+<p>Google Sheets ও Excel 365-এ আছে। VLOOKUP-এর সব সমস্যা এটা একা সমাধান করে।</p>
+<div class="fx"><code>=XLOOKUP(কী খুঁজব, কোথায় খুঁজব, কোথা থেকে আনব, না পেলে কী দেখাব)
+
+=XLOOKUP(A2, Master!B:B, Master!D:D, "পাওয়া যায়নি")</code></div>
+<ul>
+<li>কলাম নম্বর গুনতে হয় না — সোজা কলামটাই দেখিয়ে দিন</li>
+<li>বাঁ-ডান যেকোনো দিকে তাকাতে পারে</li>
+<li>না পেলে কী দেখাবে সেটা ভেতরেই বলা যায় — আলাদা IFERROR লাগে না</li>
+</ul>
+<div class="warn"><b>কিন্তু XLOOKUP পুরোনো Excel-এ নেই</b>
+Excel 2016 বা 2019-এ XLOOKUP কাজ করবে না। অনেক অফিসে এখনো পুরোনো ভার্সন চলে। তাই <strong>তিনটাই জানুন</strong> — VLOOKUP (সবখানে চলে), INDEX+MATCH (সবখানে চলে + শক্তিশালী), XLOOKUP (সবচেয়ে সহজ, নতুন ভার্সনে)।</div>
+
+<h5>দুই শর্তে Lookup — উঁচু স্তরের কৌশল</h5>
+<p>"ঢাকার IT বিভাগের ম্যানেজারের নাম" — একটা শর্তে হবে না। দুইটা কলাম জোড়া দিয়ে খুঁজুন:</p>
+<div class="fx"><code>=INDEX(D2:D100, MATCH(A2&B2, C2:C100&E2:E100, 0))</code></div>
+<p>Google Sheets-এ এটা সরাসরি কাজ করে। Excel-এ পুরোনো ভার্সনে <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> দিতে হয়।</p>
+
+<h5>দ্বিমুখী Lookup — সারি ও কলাম দুটোই খুঁজে</h5>
+<div class="fx"><code>=INDEX(B2:F100, MATCH(H1,A2:A100,0), MATCH(H2,B1:F1,0))</code></div>
+<p>H1-এ কর্মীর নাম, H2-এ মাসের নাম দিলে ওই কর্মীর ওই মাসের ঘরটা বের করে আনবে। বড় ম্যাট্রিক্স টেবিলে খুব কাজে লাগে।</p>
+<div class="task"><b>আজকের কাজ</b>
+Day 12-এর Master শিটে কলামের ক্রম উল্টে দিন — Name আগে, EmpID পরে। এখন <br>১) VLOOKUP দিয়ে EmpID থেকে Name আনার চেষ্টা করুন — <strong>ব্যর্থ হবে</strong>, এটাই দেখার বিষয় <br>২) INDEX+MATCH দিয়ে একই কাজ করুন — সফল হবে <br>৩) XLOOKUP দিয়েও করুন <br>৪) মাঝখানে একটা নতুন কলাম ঢুকিয়ে দিন — দেখুন VLOOKUP ভেঙেছে কিন্তু INDEX+MATCH অটুট <br>৫) Department + Designation দুই শর্ত দিয়ে একটা lookup বানান</div>`},
+
+  {n:14,t:"Data Validation ও Conditional Formatting",g:"ভুল ডেটা ঢোকা বন্ধ করা, আর গুরুত্বপূর্ণ জিনিস নিজে রঙিন হয়ে চোখে পড়া।",
+  html:`
+<h5>Data Validation — ঢোকার মুখে পাহারা</h5>
+<p>মানুষ ভুল লিখবে — "Dhaka", "dhaka", "DHK", "ঢাকা" সব একসাথে। ফলে COUNTIF ভুল ফল দেবে। সমাধান: হাতে লেখার সুযোগই না দেওয়া, শুধু ড্রপডাউন থেকে বাছতে দেওয়া।</p>
+<ol class="steps">
+<li>যে কলামে নিয়ম বসাতে চান সেটা সিলেক্ট করুন</li>
+<li><em>Data → Data validation → Add rule</em></li>
+<li>Criteria বাছুন — <strong>Dropdown</strong> দিলে হাতে অপশন লিখতে পারবেন, <strong>Dropdown (from a range)</strong> দিলে অন্য শিটের তালিকা থেকে আসবে</li>
+<li>"Reject input" বাছুন — তাহলে ভুল কিছু লিখলে একদম নেবেই না</li>
+<li>Help text দিন, যেমন "তালিকা থেকে শহর বাছুন"</li>
+</ol>
+<div class="note"><b>পেশাদার নিয়ম</b>
+ড্রপডাউনের অপশন হাতে না লিখে একটা আলাদা <strong>"Lists"</strong> শিটে রাখুন। পরে নতুন Department যোগ করতে হলে শুধু ওই তালিকায় একটা সারি যোগ করবেন — সব ড্রপডাউন নিজে আপডেট হয়ে যাবে।</div>
+
+<h5>অন্য কাজের Validation নিয়ম</h5>
+<table>
+<tr><th>দরকার</th><th>Criteria</th></tr>
+<tr><td>শুধু ইতিবাচক সংখ্যা</td><td>Number → greater than → 0</td></tr>
+<tr><td>বেতন ১০ হাজার – ২ লাখের মধ্যে</td><td>Number → between → 10000, 200000</td></tr>
+<tr><td>ভবিষ্যতের তারিখ নেওয়া যাবে না</td><td>Date → on or before → today</td></tr>
+<tr><td>টিক বক্স (✓)</td><td><em>Insert → Tick box</em> — ঘরে TRUE/FALSE বসে</td></tr>
+<tr><td>মোবাইল নম্বর ১১ ডিজিট</td><td>Custom formula → <code>=LEN(A2)=11</code></td></tr>
+<tr><td>ID দুইবার দেওয়া যাবে না</td><td>Custom formula → <code>=COUNTIF(A:A,A2)=1</code></td></tr>
+</table>
+
+<h5>Conditional Formatting — নিজে থেকে রং হওয়া</h5>
+<ol class="steps">
+<li>Range সিলেক্ট করে <em>Format → Conditional formatting</em></li>
+<li><strong>Single colour</strong> — শর্ত মিললে একটা রং</li>
+<li><strong>Colour scale</strong> — ছোট থেকে বড় মান অনুযায়ী রঙের ঢাল, তাপমাত্রার মতো</li>
+<li>শর্ত দিন, রং বাছুন, Done</li>
+</ol>
+<p><strong>সবচেয়ে কাজের কয়েকটা কাস্টম ফর্মুলা</strong> (Custom formula is → এখানে বসান):</p>
+<div class="fx"><code>=$E2&lt;40                       ফেল করা সারি লাল করা
+=$D2="Absent"                   অনুপস্থিত সারি চিহ্নিত করা
+=COUNTIF($A$2:$A$100,$A2)&gt;1    ডুপ্লিকেট নাম খুঁজে বের করা
+=$C2&lt;TODAY()                    ডেডলাইন পার হওয়া কাজ
+=AND($C2&gt;=TODAY(),$C2&lt;=TODAY()+7)   এই সপ্তাহের ডেডলাইন
+=ISBLANK($B2)                   খালি ঘর ধরা
+=MOD(ROW(),2)=0                 এক সারি ছেড়ে ছেড়ে রং</code></div>
+<div class="warn"><b>পুরো সারি রঙিন করার গোপন নিয়ম</b>
+শুধু একটা ঘর নয়, পুরো সারি রঙিন করতে চাইলে — <strong>Range দিন <code>A2:H100</code></strong> (পুরো টেবিল) আর ফর্মুলায় কলামের আগে <strong>একটা ডলার</strong> দিন: <code>=$E2&lt;40</code>। <br>ডলার শুধু কলামে (<code>$E</code>), সারিতে নয় (<code>2</code>)। এতে প্রতিটা সারি নিজের E কলাম দেখে সিদ্ধান্ত নেবে। এই একটা ট্রিক না জানার কারণে অনেকে ঘণ্টা নষ্ট করে।</div>
+<div class="task"><b>আজকের কাজ</b>
+একটা <strong>Task Tracker</strong> বানান: TaskName, AssignedTo, Priority, Status, DueDate, Done(টিক বক্স)। <br>১) AssignedTo, Priority (High/Medium/Low) ও Status (Not Started/In Progress/Done) — তিনটাতেই ড্রপডাউন দিন, অপশনগুলো আলাদা Lists শিটে রাখুন <br>২) DueDate পার হয়ে গেলে ও কাজ শেষ না হলে পুরো সারি লাল করুন <br>৩) Priority = High হলে সেই ঘর কমলা করুন <br>৪) Done টিক দিলে পুরো সারি সবুজ ও হালকা করুন <br>৫) DueDate খালি রাখলে সেই ঘর হলুদ করুন</div>`},
+
+  {n:15,t:"Chart — ডেটাকে ছবিতে বলা",g:"কোন ডেটার জন্য কোন চার্ট, আর চার্টকে দেখার মতো সুন্দর করা।",
+  html:`
+<h5>চার্ট বানানোর নিয়ম</h5>
+<ol class="steps">
+<li>যে ডেটা দেখাতে চান সেটা সিলেক্ট করুন — <strong>হেডার সহ</strong></li>
+<li><em>Insert → Chart</em></li>
+<li>ডান দিকে Chart editor খুলবে → <strong>Setup</strong> ট্যাবে চার্টের ধরন বদলান</li>
+<li><strong>Customize</strong> ট্যাবে রং, লেবেল, টাইটেল, অক্ষের নাম ঠিক করুন</li>
+</ol>
+
+<h5>কোন চার্ট কখন — এই টেবিলটা মুখস্থ করুন</h5>
+<table>
+<tr><th>চার্ট</th><th>কী দেখানোর জন্য</th><th>উদাহরণ</th></tr>
+<tr><td><strong>Column</strong> (খাড়া বার)</td><td>কয়েকটা জিনিসের তুলনা</td><td>মাস অনুযায়ী বিক্রি</td></tr>
+<tr><td><strong>Bar</strong> (আড়াআড়ি)</td><td>নাম লম্বা হলে বা অনেক বিভাগ থাকলে</td><td>শীর্ষ ১৫ পণ্য</td></tr>
+<tr><td><strong>Line</strong></td><td>সময়ের সাথে পরিবর্তনের ধারা</td><td>১২ মাসের বৃদ্ধি</td></tr>
+<tr><td><strong>Pie / Donut</strong></td><td>মোটের কত অংশ কে নিল</td><td>বাজেটের বিভাজন</td></tr>
+<tr><td><strong>Combo</strong></td><td>দুইটা ভিন্ন একক একসাথে</td><td>বিক্রি (বার) + লাভের হার (লাইন)</td></tr>
+<tr><td><strong>Scatter</strong></td><td>দুইটা জিনিসের মধ্যে সম্পর্ক আছে কি না</td><td>বিজ্ঞাপন খরচ vs বিক্রি</td></tr>
+<tr><td><strong>Stacked Column</strong></td><td>মোট এবং ভেতরের ভাগ — দুটোই একসাথে</td><td>মাসিক বিক্রি, অঞ্চল অনুযায়ী ভাগ</td></tr>
+</table>
+<div class="warn"><b>Pie Chart নিয়ে সাবধান</b>
+৫টার বেশি ভাগ হলে Pie Chart পড়া কঠিন হয়ে যায় — মানুষ কোণ দেখে তুলনা করতে পারে না, দৈর্ঘ্য দেখে পারে। ৫টার বেশি হলে <strong>Bar Chart</strong> ব্যবহার করুন। আর 3D Pie কখনোই না — গভীরতার কারণে সামনের ভাগ বড় দেখায়, এটা রীতিমতো মিথ্যা বলা।</div>
+
+<h5>Sparkline — ঘরের ভেতরে ছোট চার্ট</h5>
+<p>প্রতিটা সারির পাশে একটা ছোট গ্রাফ বসানো যায়। ড্যাশবোর্ডে দারুণ দেখায়:</p>
+<div class="fx"><code>=SPARKLINE(B2:M2)
+=SPARKLINE(B2:M2, {"charttype","column"; "color","green"})
+=SPARKLINE(B2:M2, {"charttype","bar"; "max",100})
+=SPARKLINE(B2, {"charttype","bar"; "max",100; "color1","#0f7a4f"})   অগ্রগতির বার</code></div>
+
+<h5>চার্ট প্রফেশনাল দেখানোর ৬টা নিয়ম</h5>
+<ul>
+<li><strong>টাইটেলে উপসংহার লিখুন</strong> — "Monthly Sales" নয়, "জুলাইয়ে বিক্রি ২৩% বেড়েছে"। পাঠক তখন নিজে ভাবতে হয় না।</li>
+<li><strong>Gridline কমিয়ে দিন</strong> — Customize → Gridlines → সংখ্যা কমান। কম দাগ, বেশি পরিষ্কার।</li>
+<li><strong>Data label দিন</strong> — Customize → Series → Data labels। তাহলে চোখে অনুমান করতে হয় না।</li>
+<li><strong>এক রং ব্যবহার করুন</strong> — সব বার একই রং, শুধু গুরুত্বপূর্ণটা আলাদা রঙে। রংধনু চার্ট অপেশাদার দেখায়।</li>
+<li><strong>Y-অক্ষ ০ থেকে শুরু করুন</strong> — বার চার্টে ০ ছাড়া শুরু করলে পার্থক্য বাড়িয়ে দেখানো হয়, যা বিভ্রান্তিকর।</li>
+<li><strong>বার চার্ট বড় থেকে ছোট সাজান</strong> — Sort করা চার্ট পড়তে অনেক সহজ।</li>
+</ul>
+<div class="note"><b>চার্ট আলাদা করে ছবি বানানো</b>
+চার্টের তিন-ডট মেনু → <em>Download → PNG image</em>। প্রেজেন্টেশনে বা রিপোর্টে বসাতে কাজে লাগবে। বা <em>Copy chart</em> করে সোজা Google Docs / Slides-এ পেস্ট করুন — ডেটা বদলালে ওখানেও আপডেট হবে।</div>
+<div class="task"><b>আজকের কাজ</b>
+১২ মাসের বিক্রির ডেটা বানান — Month, Sales, Target, Profit। এখন ৪টা চার্ট বানান: <br>১) মাসিক বিক্রির <strong>Column chart</strong>, ডেটা লেবেল সহ <br>২) Sales বনাম Target-এর <strong>Line chart</strong> <br>৩) Sales (বার) + Profit Margin % (লাইন) — <strong>Combo chart</strong> <br>৪) পণ্যের ভাগ দেখানোর <strong>Bar chart</strong> (Pie নয়!) <br>প্রতিটা চার্টের টাইটেলে শুধু নাম নয়, একটা <strong>উপসংহার</strong> লিখুন। শেষে প্রতিটা সারির পাশে একটা SPARKLINE বসান।</div>`},
+
+  {n:16,t:"Pivot Table — হাজার সারি থেকে ৫ সেকেন্ডে রিপোর্ট",g:"কোনো ফর্মুলা ছাড়াই যেকোনো ভঙ্গিতে ডেটার সারসংক্ষেপ। ইন্টারভিউর অন্যতম বড় প্রশ্ন।",
+  html:`
+<h5>Pivot Table কী করে</h5>
+<p>ধরুন ৫০০০ সারির বিক্রির ডেটা আছে। প্রশ্ন: "কোন অঞ্চলে কোন পণ্য সবচেয়ে বেশি বিক্রি হয়েছে?" SUMIFS দিয়ে করতে গেলে ৩০টা ফর্মুলা লাগবে। Pivot Table-এ কয়েকটা ড্র্যাগ-ড্রপে হয়ে যায় — আর প্রশ্ন বদলালে আবার ড্র্যাগ করে নতুন উত্তর।</p>
+<div class="note"><b>শর্ত: ডেটা "সমতল" হতে হবে</b>
+Pivot Table কাজ করার জন্য ডেটা এমন হতে হবে — <strong>প্রথম সারিতে হেডার, প্রতিটা কলামে একটাই জিনিস, কোনো merged cell নেই, কোনো খালি সারি নেই, কোনো মোট-যোগফলের সারি মাঝখানে নেই</strong>। এই নিয়ম না মানলে Pivot ভুল ফল দেবে।</div>
+
+<h5>বানানোর ধাপ</h5>
+<ol class="steps">
+<li>ডেটার যেকোনো ঘরে ক্লিক করুন</li>
+<li><em>Insert → Pivot table</em> → New sheet বাছুন</li>
+<li>ডান দিকে Editor খুলবে, চারটা খোপ থাকবে</li>
+<li>মাঠে নামানো শুরু করুন (নিচের টেবিল দেখুন)</li>
+</ol>
+<table>
+<tr><th>খোপ</th><th>এখানে কী দেবেন</th><th>উদাহরণ</th></tr>
+<tr><td><strong>Rows</strong></td><td>যা বাঁ দিকে তালিকা হয়ে দাঁড়াবে</td><td>Product, Department, Region</td></tr>
+<tr><td><strong>Columns</strong></td><td>যা উপরে ছড়িয়ে যাবে</td><td>Month, Year, Category</td></tr>
+<tr><td><strong>Values</strong></td><td>যে সংখ্যাটা হিসাব হবে</td><td>Sales (SUM), Qty (COUNT)</td></tr>
+<tr><td><strong>Filters</strong></td><td>পুরো রিপোর্টকে ছেঁকে নেওয়া</td><td>শুধু ২০২৬ সাল</td></tr>
+</table>
+
+<h5>Values-এ কী কী হিসাব পাওয়া যায়</h5>
+<p>Values-এ কোনো ফিল্ড রাখলে <strong>Summarise by</strong> বদলাতে পারবেন: SUM, COUNT, COUNTA, AVERAGE, MAX, MIN, MEDIAN, COUNTUNIQUE।</p>
+<p>আর <strong>Show as</strong> দিয়ে সংখ্যাকে শতাংশে দেখাতে পারবেন:</p>
+<ul>
+<li><strong>% of grand total</strong> — মোটের কত শতাংশ</li>
+<li><strong>% of row</strong> — সারির ভেতরে ভাগ</li>
+<li><strong>% of column</strong> — কলামের ভেতরে ভাগ</li>
+</ul>
+<p>একই ফিল্ড <strong>দুইবার</strong> Values-এ রাখতে পারেন — একবার SUM হিসেবে, আরেকবার % of grand total হিসেবে। পাশাপাশি টাকা ও শতাংশ দুটোই দেখা যাবে।</p>
+
+<h5>Calculated Field — Pivot-এর ভেতরে নিজের হিসাব</h5>
+<p>Values-এর পাশে <em>Add → Calculated field</em>। সেখানে লিখুন:</p>
+<div class="fx"><code>=Profit/Sales           লাভের হার
+=Sales-Cost             লাভ
+=Sales/Target           টার্গেট পূরণের হার</code></div>
+<p>ফিল্ডের নাম হুবহু হেডার যেমন আছে তেমনই লিখতে হবে।</p>
+
+<h5>যেগুলো আসল কাজে লাগে</h5>
+<ul>
+<li><strong>তারিখকে মাস অনুযায়ী গোছানো</strong> — Rows-এ তারিখ দিয়ে ডান-ক্লিক → <em>Create pivot date group → Month</em>। ৩৬৫টা সারি ১২টা হয়ে যাবে।</li>
+<li><strong>Sort করা</strong> — Rows-এর নিচে "Sort by" বদলে Sales অনুযায়ী সাজান, "Order" = Descending। তাহলে শীর্ষ পণ্য উপরে আসবে।</li>
+<li><strong>শীর্ষ ১০ দেখা</strong> — Filter-এ Sales দিয়ে "Top 10" বাছুন।</li>
+<li><strong>Slicer জুড়ে দেওয়া</strong> — <em>Data → Add a slicer</em>। Pivot-এর পাশে সুন্দর ড্রপডাউন বসবে, ড্যাশবোর্ডে অপরিহার্য।</li>
+<li><strong>Pivot Chart</strong> — Pivot Table সিলেক্ট করে Insert → Chart। Pivot বদলালে চার্টও বদলাবে।</li>
+</ul>
+<div class="warn"><b>Pivot Table থেকে সরাসরি কপি করবেন না</b>
+Pivot Table-এর ঘর অন্য জায়গায় কপি করে ফর্মুলা লিখলে Pivot রিফ্রেশ হলে সব সরে গিয়ে ভুল হবে। Pivot-এর ফলাফল অন্য শিটে দরকার হলে <code>GETPIVOTDATA</code> ব্যবহার করুন, বা <strong>Paste special → Values only</strong> দিয়ে আলাদা কপি রাখুন।</div>
+<div class="task"><b>আজকের কাজ</b>
+১০০ সারির একটা বিক্রির ডেটা বানান: Date, Region (৪টা), Salesperson (৫ জন), Product (৬টা), Qty, UnitPrice, Sales। এখন <strong>৫টা আলাদা Pivot Table</strong> বানান — <br>১) অঞ্চল অনুযায়ী মোট বিক্রি <br>২) পণ্য × অঞ্চল — ক্রস টেবিল <br>৩) মাস অনুযায়ী বিক্রির ধারা (date grouping ব্যবহার করুন) <br>৪) বিক্রয়কর্মী অনুযায়ী মোট বিক্রি, বেশি থেকে কম সাজানো <br>৫) প্রতিটা পণ্য মোট বিক্রির কত শতাংশ (% of grand total) <br>শেষে একটা Slicer বসিয়ে Region বদলে দেখুন সব একসাথে বদলাচ্ছে।</div>`},
+
+  {n:17,t:"Google Sheets-এর নিজস্ব সুপারপাওয়ার",g:"QUERY, ARRAYFORMULA, FILTER, UNIQUE, IMPORTRANGE — যা Excel-এ নেই বা ভিন্ন।",
+  html:`
+<h5>কেন এই দিনটা আলাদা</h5>
+<p>এই ফাংশনগুলো Google Sheets-এর একদম নিজের। Excel-এ এগুলোর কোনোটা নেই, কোনোটার ভিন্ন নাম। এগুলো জানলে Google Sheets দিয়ে যা করা যায়, Excel-এ তার জন্য অনেক বেশি খাটতে হয়।</p>
+
+<h5>UNIQUE, SORT, FILTER — তিন যোদ্ধা</h5>
+<div class="fx"><code>=UNIQUE(A2:A100)                       ডুপ্লিকেট বাদ দিয়ে আলাদা মানগুলো
+=SORT(A2:C100, 3, FALSE)               ৩ নম্বর কলাম অনুযায়ী বড় থেকে ছোট
+=FILTER(A2:C100, C2:C100&gt;50000)        শর্ত মেলা সারিগুলো আলাদা করে দেখানো
+=FILTER(A2:C100, C2:C100&gt;50000, B2:B100="IT")   দুই শর্ত একসাথে
+=COUNTUNIQUE(A2:A100)                  কতগুলো আলাদা মান আছে</code></div>
+<p><code>FILTER</code> Data menu-র ফিল্টারের চেয়ে ভালো — কারণ এটা মূল ডেটা না ছুঁয়ে <strong>আলাদা জায়গায়</strong> ফলাফল বসায়। রিপোর্ট বানাতে এটাই দরকার।</p>
+<p><strong>জোড়া দিলে শক্তি বাড়ে:</strong></p>
+<div class="fx"><code>=SORT(UNIQUE(B2:B100))                      সব Department, বর্ণানুক্রমে
+=SORT(FILTER(A2:D100, D2:D100&gt;50000), 4, FALSE)   ৫০ হাজারের বেশি বেতন, বড় থেকে ছোট</code></div>
+
+<h5>ARRAYFORMULA — একবার লিখে পুরো কলাম</h5>
+<p>প্রতিটা সারিতে ফর্মুলা টেনে নামানোর দরকার নেই। একটা ঘরে লিখলেই পুরো কলাম হিসাব হয়ে যাবে:</p>
+<div class="fx"><code>=ARRAYFORMULA(B2:B100*C2:C100)
+=ARRAYFORMULA(IF(B2:B100="", "", B2:B100*C2:C100))
+=ARRAYFORMULA(IF(ROW(A2:A100)=2, "Total", B2:B100*C2:C100))</code></div>
+<div class="note"><b>কেন এটা এত ভালো</b>
+নতুন সারি যোগ করলেও ফর্মুলা নিজে সেখানে কাজ করবে — টেনে নামাতে ভুলে যাওয়ার ঝুঁকি নেই। আর ফাইল অনেক হালকা থাকে, কারণ ১০০০টা আলাদা ফর্মুলার বদলে একটাই ফর্মুলা। বড় শিট ধীর হয়ে গেলে এভাবে ঠিক করা যায়।</div>
+
+<h5>QUERY — শিটের ভেতরে SQL</h5>
+<p>এটা Google Sheets-এর সবচেয়ে শক্তিশালী ফাংশন। একটা ফর্মুলায় select, filter, group, sort, limit — সব একসাথে।</p>
+<div class="fx"><code>=QUERY(A1:E100, "SELECT A, B, E WHERE E &gt; 50000 ORDER BY E DESC LIMIT 10")</code></div>
+<div class="fx"><code>=QUERY(A1:E100, "SELECT B, SUM(E) WHERE C='Dhaka' GROUP BY B ORDER BY SUM(E) DESC", 1)</code></div>
+<p>শেষের <code>1</code> মানে "প্রথম সারিটা হেডার"।</p>
+<table>
+<tr><th>অংশ</th><th>কাজ</th></tr>
+<tr><td><code>SELECT</code></td><td>কোন কলাম দেখাবে — কলামের চিঠি দিয়ে (A, B, C)</td></tr>
+<tr><td><code>WHERE</code></td><td>শর্ত — <code>&gt;</code>, <code>&lt;</code>, <code>=</code>, <code>LIKE '%text%'</code>, <code>IS NOT NULL</code></td></tr>
+<tr><td><code>GROUP BY</code></td><td>গুচ্ছ করে যোগ/গড় — Pivot Table-এর মতো</td></tr>
+<tr><td><code>ORDER BY</code></td><td>সাজানো — <code>ASC</code> বা <code>DESC</code></td></tr>
+<tr><td><code>LIMIT</code></td><td>কতগুলো সারি দেখাবে</td></tr>
+<tr><td><code>LABEL</code></td><td>কলামের নাম বদলানো</td></tr>
+</table>
+<p><strong>ঘর থেকে শর্ত নেওয়া</strong> — ড্যাশবোর্ডের জন্য এটাই আসল কৌশল:</p>
+<div class="fx"><code>=QUERY(A1:E100, "SELECT A,B,E WHERE C='"&amp;G1&amp;"' ORDER BY E DESC", 1)</code></div>
+<p>G1-এ শহরের নাম বদলালেই পুরো রিপোর্ট বদলে যাবে। কোটেশন চিহ্নগুলো খেয়াল করুন — লেখা তুলনায় সিঙ্গেল কোট লাগে।</p>
+
+<h5>IMPORTRANGE — অন্য ফাইল থেকে ডেটা টানা</h5>
+<div class="fx"><code>=IMPORTRANGE("স্প্রেডশিটের URL বা ID", "Sheet1!A1:E100")</code></div>
+<p>প্রথমবার লিখলে একটা <code>#REF!</code> আসবে — ঘরে ক্লিক করে <strong>Allow access</strong> চাপুন। এরপর সংযোগ স্থায়ী হয়ে যাবে।</p>
+<p>এভাবে একাধিক টিমের আলাদা ফাইল থেকে ডেটা এক জায়গায় এনে রিপোর্ট বানানো যায়। জোড়া দিলে আরও ভালো:</p>
+<div class="fx"><code>=QUERY(IMPORTRANGE("URL","Data!A:E"), "SELECT Col2, SUM(Col5) GROUP BY Col2", 1)</code></div>
+<p>খেয়াল করুন — IMPORTRANGE-এর ভেতরে কলামের নাম <code>Col1, Col2</code> হয়ে যায়, A/B/C নয়।</p>
+<div class="warn"><b>Excel-এ যাওয়ার আগে জেনে রাখুন</b>
+<code>QUERY</code>, <code>IMPORTRANGE</code>, <code>SPARKLINE</code>, <code>ARRAYFORMULA</code> — এগুলোর কোনো Excel সমতুল্য নেই। Excel-এ এই কাজগুলো Power Query আর Pivot Table দিয়ে করা হয় (দিন ২৫ ও ২৭)। তাই দুই জগতেই কাজ করতে হলে দুই পদ্ধতিই জানা লাগবে।</div>
+<div class="task"><b>আজকের কাজ</b>
+Day 16-এর ১০০ সারির বিক্রির ডেটা নিয়ে করুন — <br>১) UNIQUE + SORT দিয়ে সব Product-এর বর্ণানুক্রমিক তালিকা <br>২) FILTER দিয়ে শুধু ঢাকার ৫০ হাজারের বেশি বিক্রি দেখান <br>৩) ARRAYFORMULA দিয়ে একটাই ফর্মুলায় পুরো Sales কলাম (Qty × Price) বানান <br>৪) QUERY দিয়ে প্রতিটা Salesperson-এর মোট বিক্রি, বেশি থেকে কম <br>৫) QUERY-তে শর্ত একটা ঘর থেকে নিন — ঘরের মান বদলে দেখুন রিপোর্ট বদলাচ্ছে <br>৬) নতুন একটা ফাইল বানিয়ে IMPORTRANGE দিয়ে এই ডেটা টেনে আনুন</div>`},
+
+  {n:18,t:"একসাথে কাজ করা ও শিট রক্ষা করা",g:"শেয়ার, কমেন্ট, নির্দিষ্ট অংশ লক করা, ভুল হলে পিছিয়ে যাওয়া, Google Form জুড়ে দেওয়া।",
+  html:`
+<h5>শেয়ার করার তিন স্তর</h5>
+<table>
+<tr><th>স্তর</th><th>কী করতে পারবে</th><th>কাকে দেবেন</th></tr>
+<tr><td><strong>Viewer</strong></td><td>শুধু দেখতে পারবে</td><td>ম্যানেজমেন্ট, ক্লায়েন্ট</td></tr>
+<tr><td><strong>Commenter</strong></td><td>দেখবে ও মন্তব্য করবে, বদলাতে পারবে না</td><td>রিভিউয়ার</td></tr>
+<tr><td><strong>Editor</strong></td><td>সব বদলাতে পারবে</td><td>টিমের সদস্য</td></tr>
+</table>
+<div class="warn"><b>"Anyone with the link" দেওয়ার আগে দুইবার ভাবুন</b>
+বেতনের শিট বা ব্যক্তিগত তথ্যের শিটে এটা দিলে লিংক যার কাছে যাবে সে-ই দেখতে পাবে — গুগল সার্চেও চলে আসতে পারে। সবসময় নির্দিষ্ট ইমেইল ঠিকানা ধরে শেয়ার করুন।</div>
+
+<h5>নির্দিষ্ট অংশ রক্ষা করা</h5>
+<p>টিমকে Editor দিতে হবে, কিন্তু আপনার ফর্মুলাগুলো যেন কেউ মুছে না ফেলে?</p>
+<ol class="steps">
+<li>যে Range রক্ষা করতে চান সেটা সিলেক্ট করুন</li>
+<li><em>Data → Protect sheets and ranges → Add a sheet or range</em></li>
+<li>Set permissions → <strong>Restrict who can edit this range</strong> → শুধু নিজেকে রাখুন</li>
+<li>বা <strong>Show a warning</strong> বাছুন — তাহলে বদলানো যাবে কিন্তু আগে একটা সতর্কবার্তা আসবে</li>
+</ol>
+<p><strong>পেশাদার সাজানোর নিয়ম:</strong> ইনপুট ঘরগুলো একটা হালকা রঙে রাখুন (যেন বোঝা যায় "এখানে লিখতে হবে"), আর সব ফর্মুলার ঘর Protect করে দিন। এতে মানুষ ভুল করার সুযোগই পাবে না।</p>
+
+<h5>Comment ও Assign</h5>
+<ul>
+<li>ঘরে ডান-ক্লিক → <em>Comment</em> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>M</kbd>)</li>
+<li>কমেন্টে <code>@ইমেইল</code> লিখলে সেই ব্যক্তি ইমেইল নোটিফিকেশন পাবে</li>
+<li>কমেন্টে <strong>Assign to</strong> টিক দিলে এটা তার একটা কাজ (task) হয়ে যাবে</li>
+<li>কাজ শেষ হলে <strong>Resolve</strong> চাপুন — কমেন্ট লুকিয়ে যাবে কিন্তু ইতিহাসে থাকবে</li>
+</ul>
+<div class="note"><b>Note বনাম Comment</b>
+<em>Insert → Note</em> দিলে ঘরের কোনায় একটা ছোট চিহ্ন বসে, মাউস নিলে লেখা দেখায়। এটা কাউকে জানায় না — শুধু নিজের বা পাঠকের জন্য ব্যাখ্যা লিখে রাখার জন্য। জটিল ফর্মুলার ঘরে একটা Note রেখে দিন যাতে ৬ মাস পরে নিজে বুঝতে পারেন।</div>
+
+<h5>Version History — সময়ের যন্ত্র</h5>
+<p><em>File → Version history → See version history</em>। এখানে</p>
+<ul>
+<li>ঘণ্টা ধরে ধরে সব পরিবর্তন দেখা যায় — কে কী বদলেছে, রঙিন করে দেখায়</li>
+<li>যেকোনো পুরোনো অবস্থায় <strong>Restore</strong> করা যায়</li>
+<li>গুরুত্বপূর্ণ অবস্থার নাম দিয়ে রাখা যায় — <em>Name this version</em>, যেমন "জুলাই মাসের চূড়ান্ত রিপোর্ট"</li>
+</ul>
+<p>একটা ঘরের ইতিহাস দেখতে: ঘরে ডান-ক্লিক → <em>Show edit history</em>।</p>
+
+<h5>Google Form দিয়ে ডেটা সংগ্রহ</h5>
+<p>মানুষকে শিটে ঢুকতে না দিয়েই ডেটা নেওয়া যায় — এটাই সবচেয়ে নিরাপদ উপায়:</p>
+<ol class="steps">
+<li>শিটে <em>Tools → Create a new form</em></li>
+<li>প্রশ্ন বানান — Short answer, Multiple choice, Date, Dropdown</li>
+<li>Form পূরণ করলে উত্তর নিজে থেকেই শিটে নতুন সারি হয়ে বসবে</li>
+<li>Form-এর শিটে সরাসরি ফর্মুলা লিখবেন না — নতুন সারি এলে সরে যেতে পারে। বরং <strong>আলাদা শিটে</strong> QUERY বা ARRAYFORMULA দিয়ে রিপোর্ট বানান</li>
+</ol>
+<div class="task"><b>আজকের কাজ</b>
+Day 14-এর Task Tracker শিটটা নিন। <br>১) হেডার সারি ও সব ফর্মুলার কলাম Protect করুন <br>২) ইনপুট ঘরগুলো হালকা নীল রঙ দিন যেন আলাদা বোঝা যায় <br>৩) একটা ঘরে কমেন্ট করে নিজেকে assign করুন <br>৪) কিছু ডেটা মুছে ফেলুন, তারপর Version history দিয়ে ফিরিয়ে আনুন <br>৫) একটা Google Form বানান যা দিয়ে নতুন Task জমা দেওয়া যায়, এবং একটা আলাদা শিটে QUERY দিয়ে শুধু "High Priority" কাজগুলোর তালিকা দেখান</div>`},
+
+  {n:19,t:"ডেটা পরিষ্কার করার সম্পূর্ণ পদ্ধতি",g:"বাস্তব চাকরিতে সময়ের ৬০-৭০% এই কাজেই যায়। ধাপগুলো মুখস্থ করে ফেলুন।",
+  html:`
+<h5>একটা স্থায়ী চেকলিস্ট</h5>
+<p>নতুন ডেটা পেলে <strong>প্রতিবার এই ৯টা ধাপ</strong> এই ক্রমে করুন। ক্রম উল্টালে কাজ বাড়বে।</p>
+<ol class="steps">
+<li><strong>মূল কপি রাখুন</strong> — শিটে ডান-ক্লিক → Duplicate, নাম দিন "RAW — do not touch"। কিছু ভেঙে গেলে ফিরে আসার জায়গা থাকবে।</li>
+<li><strong>খালি সারি ও কলাম মুছুন</strong> — <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>↓</kbd> দিয়ে নিচের সব খালি সারি সিলেক্ট করে ডিলিট করুন।</li>
+<li><strong>TRIM চালান</strong> — একটা সাহায্যকারী কলামে <code>=TRIM(A2)</code>, তারপর Paste values only দিয়ে মূল কলামে বসান।</li>
+<li><strong>ডুপ্লিকেট খুঁজুন</strong> — <em>Data → Data cleanup → Remove duplicates</em>। কিন্তু আগে <code>=COUNTIF(A:A,A2)&gt;1</code> দিয়ে দেখে নিন কোনগুলো ডুপ্লিকেট, তারপর মুছুন।</li>
+<li><strong>টেক্সট এক রকম করুন</strong> — <code>PROPER</code> দিয়ে নাম, <code>UPPER</code> দিয়ে কোড। "dhaka"/"Dhaka"/"DHAKA" — তিনটা আলাদা হয়ে থাকলে সব রিপোর্ট ভুল হবে।</li>
+<li><strong>সংখ্যা সত্যিই সংখ্যা কি না দেখুন</strong> — <code>=ISNUMBER(B2)</code>। FALSE এলে সেটা text। <code>=VALUE(B2)</code> দিয়ে সংখ্যায় বদলান।</li>
+<li><strong>তারিখ ঠিক করুন</strong> — <code>=ISDATE(C2)</code> দিয়ে চেক করুন। text হলে <code>DATEVALUE</code> বা SPLIT + DATE দিয়ে বানান।</li>
+<li><strong>এক কলামে এক জিনিস</strong> — "Rahim Uddin, Dhaka" একটা ঘরে থাকলে <em>Data → Split text to columns</em> দিয়ে ভাগ করুন।</li>
+<li><strong>যাচাই করুন</strong> — মোট সারি সংখ্যা, মোট যোগফল আগে-পরে মিলিয়ে দেখুন। হঠাৎ ২০টা সারি হারিয়ে গেলে বুঝবেন কিছু ভুল হয়েছে।</li>
+</ol>
+
+<h5>Find & Replace-এর শক্তিশালী রূপ</h5>
+<p><kbd>Ctrl</kbd>+<kbd>H</kbd> চাপুন। নিচে দুইটা টিক বক্স আছে যা বেশিরভাগ মানুষ খেয়াল করে না:</p>
+<ul>
+<li><strong>Search using regular expressions</strong> — প্যাটার্ন দিয়ে খোঁজা</li>
+<li><strong>Also search within formulas</strong> — ফর্মুলার ভেতরে বদলানো, যেমন সব শিটের নাম একসাথে বদলানো</li>
+</ul>
+<p>কাজের কয়েকটা regex:</p>
+<table>
+<tr><th>প্যাটার্ন</th><th>কী ধরবে</th></tr>
+<tr><td><code>\\s+$</code></td><td>শেষের সব স্পেস</td></tr>
+<tr><td><code>^\\s+</code></td><td>শুরুর সব স্পেস</td></tr>
+<tr><td><code>[^0-9]</code></td><td>সংখ্যা ছাড়া সবকিছু (ফোন নম্বর পরিষ্কার করতে)</td></tr>
+<tr><td><code>\\s{2,}</code></td><td>দুই বা তার বেশি পাশাপাশি স্পেস</td></tr>
+</table>
+
+<h5>যাচাই করার ফর্মুলা</h5>
+<div class="fx"><code>=ISNUMBER(B2)                     সংখ্যা কি না
+=ISDATE(C2)                       তারিখ কি না
+=ISBLANK(A2)                      খালি কি না
+=COUNTBLANK(A2:A100)              কতগুলো ঘর খালি
+=COUNTIF(A:A,A2)&gt;1                এই মান একবারের বেশি আছে কি না
+=LEN(A2)-LEN(TRIM(A2))            কতগুলো বাড়তি স্পেস আছে
+=EXACT(A2,B2)                     দুইটা লেখা হুবহু এক কি না
+=IF(COUNTIF(Master!A:A,A2)=0,"Master-এ নেই","OK")   মিলিয়ে দেখা</code></div>
+<div class="note"><b>একটা QC শিট বানানোর অভ্যাস করুন</b>
+আলাদা একটা "QC" শিটে এই যাচাইগুলো একবার বসিয়ে রাখুন — মোট সারি, খালি ঘর কতগুলো, ডুপ্লিকেট কতগুলো, যোগফল কত। প্রতিবার নতুন ডেটা এলে এক নজরে দেখে নিতে পারবেন সব ঠিক আছে কি না। পেশাদাররা এটাই করে — আর এই অভ্যাসটাই আপনাকে অন্যদের থেকে আলাদা করবে।</div>
+<div class="warn"><b>সোনার নিয়ম</b>
+কখনো <strong>RAW ডেটার উপরে সরাসরি কাজ করবেন না</strong>। RAW → Clean → Report — তিনটা আলাদা শিট রাখুন। ভুল ধরা পড়লে RAW থেকে আবার শুরু করতে পারবেন। এটা না করে অনেকে একদিনের কাজ নষ্ট করে।</div>
+<div class="task"><b>আজকের কাজ</b>
+ইচ্ছা করে একটা <strong>নোংরা ডেটা</strong> বানান — ৩০ সারি, যেখানে থাকবে: বাড়তি স্পেস, বড়-ছোট হাত মেশানো নাম, ডুপ্লিকেট আইডি, খালি ঘর, "1,200 Tk" এভাবে লেখা সংখ্যা, আর <code>05/07/26</code> এভাবে লেখা তারিখ। <br>এখন উপরের ৯ ধাপ মেনে সেটা পরিষ্কার করুন — RAW, Clean আর QC — তিনটা শিট রেখে। QC শিটে দেখান: মোট সারি, ডুপ্লিকেট সংখ্যা, খালি ঘর সংখ্যা, আর কতগুলো ঘরে সংখ্যা text হয়ে ছিল।</div>`},
+
+  {n:20,t:"প্রজেক্ট ২ — Sales Dashboard (Google Sheets)",g:"ফিল্টার বদলালেই সব চার্ট-সংখ্যা বদলায় — এমন একটা জীবন্ত ড্যাশবোর্ড।",
+  html:`
+<h5>লক্ষ্য</h5>
+<p>একটা এক-পাতার ড্যাশবোর্ড, যেখানে উপরে কয়েকটা বড় সংখ্যা (KPI), পাশে ড্রপডাউন ফিল্টার, আর নিচে চার্ট। ফিল্টার বদলালে <strong>সবকিছু একসাথে বদলাবে</strong>। এই একটা ফাইল বানাতে পারলে ইন্টারভিউতে দেখানোর মতো কাজ হয়ে যাবে।</p>
+
+<h5>শিটের কাঠামো — এই ভাগটা খুব জরুরি</h5>
+<table>
+<tr><th>শিট</th><th>কাজ</th></tr>
+<tr><td><strong>1. RAW</strong></td><td>মূল ডেটা, কেউ ছোঁবে না</td></tr>
+<tr><td><strong>2. Lists</strong></td><td>ড্রপডাউনের অপশনগুলো</td></tr>
+<tr><td><strong>3. Calc</strong></td><td>সব হিসাব — এখানেই ফর্মুলা</td></tr>
+<tr><td><strong>4. Dashboard</strong></td><td>শুধু দেখার জিনিস — সংখ্যা ও চার্ট</td></tr>
+</table>
+<div class="note"><b>কেন এই ভাগ</b>
+হিসাব আর দেখানোর জিনিস আলাদা রাখলে ড্যাশবোর্ড পরিষ্কার থাকে, ভাঙলে সহজে ঠিক করা যায়, আর অন্য কেউ খুলেও বুঝতে পারে। এটাই পেশাদার কাঠামো — যেকোনো ড্যাশবোর্ড এভাবেই বানানো হয়।</div>
+
+<h5>ধাপ ১ — RAW ডেটা</h5>
+<p>২০০ সারি বানান (Fill Handle ও <code>RANDBETWEEN</code> দিয়ে দ্রুত করতে পারেন): <br>OrderID, OrderDate, Region, Salesperson, Product, Category, Qty, UnitPrice, Cost</p>
+<div class="fx"><code>Sales   =ARRAYFORMULA(IF(G2:G201="","",G2:G201*H2:H201))
+Profit  =ARRAYFORMULA(IF(G2:G201="","",(H2:H201-I2:I201)*G2:G201))
+Month   =ARRAYFORMULA(IF(B2:B201="","",TEXT(B2:B201,"mmm-yyyy")))</code></div>
+
+<h5>ধাপ ২ — Dashboard-এ ফিল্টার বসান</h5>
+<p>Dashboard শিটের উপরে দুইটা ঘর রাখুন (ধরুন B3 ও B4), Data validation দিয়ে ড্রপডাউন করুন:</p>
+<ul>
+<li><strong>B3</strong> = Region — Lists শিটের Region তালিকা থেকে, উপরে একটা "All" অপশন রাখুন</li>
+<li><strong>B4</strong> = Month — Lists শিটের Month তালিকা থেকে, "All" সহ</li>
+</ul>
+
+<h5>ধাপ ৩ — KPI-গুলো (Calc শিটে)</h5>
+<p>"All" অপশনটা সামলানোর কৌশল — শর্তে <code>*</code> ব্যবহার করা:</p>
+<div class="fx"><code>মোট বিক্রি
+=SUMIFS(RAW!J:J, RAW!C:C, IF(Dashboard!B3="All","*",Dashboard!B3),
+        RAW!L:L, IF(Dashboard!B4="All","*",Dashboard!B4))
+
+মোট লাভ      একই ফর্মুলা, শুধু J-এর বদলে K
+অর্ডার সংখ্যা  =COUNTIFS(...) একই শর্ত দিয়ে
+গড় অর্ডার মূল্য =IFERROR(মোট বিক্রি/অর্ডার সংখ্যা, 0)
+লাভের হার     =IFERROR(মোট লাভ/মোট বিক্রি, 0)   → Percent format
+শীর্ষ পণ্য    =INDEX(UNIQUE(RAW!E:E), MATCH(MAX(...), ..., 0))</code></div>
+<p>বা অনেক সহজভাবে QUERY দিয়ে (দিন ১৭):</p>
+<div class="fx"><code>=QUERY(RAW!A1:L201, "SELECT E, SUM(J) GROUP BY E ORDER BY SUM(J) DESC LIMIT 5", 1)</code></div>
+
+<h5>ধাপ ৪ — Dashboard সাজান</h5>
+<ul>
+<li>উপরে ৫টা <strong>KPI কার্ড</strong> — কয়েকটা ঘর merge করে, বড় ফন্টে সংখ্যা, নিচে ছোট করে লেবেল, হালকা রঙের ব্যাকগ্রাউন্ড ও বর্ডার</li>
+<li>মাসিক বিক্রির <strong>Line chart</strong></li>
+<li>অঞ্চল অনুযায়ী <strong>Column chart</strong></li>
+<li>শীর্ষ ৫ পণ্যের <strong>Bar chart</strong> (বড় থেকে ছোট সাজানো)</li>
+<li>Category অনুযায়ী <strong>Donut chart</strong></li>
+<li>বিক্রয়কর্মীর টেবিল, প্রতিটার পাশে <code>SPARKLINE</code> দিয়ে অগ্রগতির বার</li>
+<li>Conditional formatting — টার্গেটের নিচে থাকলে লাল, উপরে থাকলে সবুজ</li>
+</ul>
+
+<h5>ধাপ ৫ — শেষ ছোঁয়া</h5>
+<ul>
+<li><em>View → Show → Gridlines</em> বন্ধ করুন — সাথে সাথে প্রফেশনাল দেখাবে</li>
+<li>উপরে একটা টাইটেল বার — merge করা ঘর, গাঢ় রং, সাদা লেখা</li>
+<li>ফিল্টারের ঘর দুটো হালকা রঙে রাখুন যেন বোঝা যায় "এখানে বদলাতে হবে"</li>
+<li>Calc শিট লুকিয়ে দিন — ডান-ক্লিক → Hide sheet</li>
+<li>RAW ও Calc শিট Protect করুন</li>
+<li>"Last updated: <code>=TEXT(TODAY(),"dd mmm yyyy")</code>" একটা কোনায় লিখুন</li>
+</ul>
+<div class="warn"><b>টেস্ট করবেন এভাবে</b>
+Region ড্রপডাউনে প্রতিটা অপশন একবার করে বাছুন। প্রতিবার — সব KPI বদলাচ্ছে? সব চার্ট বদলাচ্ছে? কোথাও <code>#DIV/0!</code> বা <code>#N/A</code> আসছে? Month = "All" দিলে ঠিক আসছে? কোনো একটা জায়গা না বদলালে সেই ফর্মুলায় ফিল্টারের ঘর ধরা হয়নি — খুঁজে বের করুন।</div>
+<div class="task"><b>আজকের কাজ</b>
+পুরো ড্যাশবোর্ডটা বানান। শেষ হলে নিজেকে এই পরীক্ষায় ফেলুন: <strong>এই ফাইলটা কাউকে পাঠালে সে কোনো ব্যাখ্যা ছাড়া নিজে ব্যবহার করতে পারবে?</strong> না পারলে লেবেল, রং আর নির্দেশনা যোগ করুন। নাম দিন <strong>"Project 2 — Sales Dashboard"</strong>। <br><br>🎉 আপনার Google Sheets পর্ব শেষ। কাল থেকে Excel — আর দেখবেন, ৮০% জিনিস আপনার আগেই জানা।</div>`}
+  ]
+},
+{
+  pn:"Phase 3 · দিন ২১–২৬",
+  title:"Excel-এ পাড়ি — যেখানে অফিসের আসল কাজ হয়",
+  desc:"আপনার শেখা সবকিছু Excel-এ কাজ করবে। এই ৬ দিন শুধু পার্থক্যগুলো আর Excel-এর নিজস্ব শক্তি শিখবেন।",
+  days:[
+  {n:21,t:"Excel-এ পা রাখা — Ribbon, ফাইল ফরম্যাট, পার্থক্য",g:"পরিবেশ চেনা এবং কোনটা Sheets-এর মতো, কোনটা আলাদা — তা বোঝা।",
+  html:`
+<h5>আগে একটা আশ্বাস</h5>
+<p>দিন ১ থেকে ২০ পর্যন্ত শেখা <strong>প্রায় সব ফর্মুলা Excel-এ হুবহু একইভাবে কাজ করে</strong>। SUM, IF, VLOOKUP, INDEX, MATCH, SUMIFS, COUNTIFS, TEXT, DATEDIF, Pivot Table, Chart, Conditional Formatting, Data Validation — সব এক। তাই এই ফেজে নতুন শেখার চাপ কম, শুধু নতুন পরিবেশে অভ্যস্ত হওয়ার ব্যাপার।</p>
+
+<h5>Excel কীভাবে পাবেন</h5>
+<table>
+<tr><th>উপায়</th><th>খরচ</th><th>সীমাবদ্ধতা</th></tr>
+<tr><td><strong>Excel for the web</strong> (office.com)</td><td>ফ্রি</td><td>Power Query, Macro, কিছু advanced ফিচার নেই</td></tr>
+<tr><td><strong>Microsoft 365</strong></td><td>মাসিক সাবস্ক্রিপশন</td><td>সব ফিচার, সবচেয়ে নতুন ফাংশন</td></tr>
+<tr><td><strong>Office 2021/2019</strong></td><td>একবারের কেনা</td><td>XLOOKUP ও নতুন ফাংশন নেই (2019-এ)</td></tr>
+<tr><td><strong>LibreOffice Calc</strong></td><td>ফ্রি</td><td>প্রায় সব চলে, কিন্তু Pivot ও Power Query দুর্বল</td></tr>
+</table>
+<div class="note"><b>পরামর্শ</b>
+শুরুতে <strong>Excel for the web</strong> দিয়েই চালিয়ে নিন — দিন ২৬ পর্যন্ত সব শেখা যাবে। দিন ২৭-এ Power Query শিখতে ডেস্কটপ ভার্সন লাগবে। ততদিনে বুঝে যাবেন এটা আপনার জন্য দরকারি কি না।</div>
+
+<h5>Ribbon — উপরের সেই ট্যাবগুলো</h5>
+<p>Google Sheets-এ মেনু ছোট ও লেখা দিয়ে। Excel-এ Ribbon — বড় বড় আইকনের ট্যাব। কোন ট্যাবে কী আছে:</p>
+<table>
+<tr><th>ট্যাব</th><th>এখানে যা পাবেন</th></tr>
+<tr><td><strong>Home</strong></td><td>ফন্ট, রং, Number Format, Conditional Formatting, Sort & Filter, Find</td></tr>
+<tr><td><strong>Insert</strong></td><td>Table, PivotTable, Chart, Slicer, Picture, Shape</td></tr>
+<tr><td><strong>Formulas</strong></td><td>ফাংশনের তালিকা, Name Manager, Trace Precedents, Calculation Options</td></tr>
+<tr><td><strong>Data</strong></td><td>Get Data (Power Query), Sort, Filter, Text to Columns, Remove Duplicates, What-If</td></tr>
+<tr><td><strong>Review</strong></td><td>Protect Sheet, Protect Workbook, Comment, Spell Check</td></tr>
+<tr><td><strong>View</strong></td><td>Freeze Panes, Gridlines, Zoom, Page Layout, New Window</td></tr>
+</table>
+<p><strong>Ribbon লুকিয়ে জায়গা বাড়াতে</strong> <kbd>Ctrl</kbd>+<kbd>F1</kbd>। আর <kbd>Alt</kbd> চাপলে প্রতিটা ট্যাবের উপর অক্ষর দেখাবে — কীবোর্ড দিয়েই সব মেনু ঘোরা যায়।</p>
+
+<h5>ফাইল ফরম্যাট — এটা ভুল করলে কাজ হারাবেন</h5>
+<table>
+<tr><th>এক্সটেনশন</th><th>কী</th><th>কখন</th></tr>
+<tr><td><code>.xlsx</code></td><td>সাধারণ Excel ফাইল</td><td>৯৫% ক্ষেত্রে এটাই</td></tr>
+<tr><td><code>.xlsm</code></td><td>Macro সহ ফাইল</td><td>VBA কোড থাকলে অবশ্যই এটা</td></tr>
+<tr><td><code>.xlsb</code></td><td>বাইনারি — আকারে ছোট, দ্রুত</td><td>খুব বড় ফাইলে</td></tr>
+<tr><td><code>.csv</code></td><td>শুধু সাদামাটা লেখা, কমা দিয়ে আলাদা</td><td>সিস্টেম থেকে ডেটা আনা-নেওয়ায়</td></tr>
+</table>
+<div class="warn"><b>CSV নিয়ে তিনটা বিপদ</b>
+<strong>১)</strong> CSV-তে ফর্মুলা, রং, একাধিক শিট — কিছুই থাকে না। শুধু কাঁচা মান।<br>
+<strong>২)</strong> CSV হিসেবে সেভ করলে Excel সতর্ক করবে "some features may be lost" — এটা আসল সতর্কবার্তা, উপেক্ষা করবেন না।<br>
+<strong>৩)</strong> CSV-তে <code>0088017...</code> এমন নম্বরের সামনের শূন্য মুছে যায়। ফোন নম্বর বা অ্যাকাউন্ট নম্বর থাকলে খুলার সময় Power Query দিয়ে খুলুন এবং ওই কলামকে Text ধরতে বলুন।</div>
+
+<h5>মূল পার্থক্যগুলো</h5>
+<table>
+<tr><th>বিষয়</th><th>Google Sheets</th><th>Excel</th></tr>
+<tr><td>সেভ</td><td>নিজে হয়</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd> চাপতে হয় (OneDrive-এ রাখলে অটো)</td></tr>
+<tr><td>আকারের সীমা</td><td>১ কোটি ঘর</td><td>১০ লাখ+ সারি, প্রতি শিটে</td></tr>
+<tr><td>গতি (বড় ডেটায়)</td><td>ধীর হয়ে যায়</td><td>অনেক দ্রুত</td></tr>
+<tr><td>একসাথে কাজ</td><td>দুর্দান্ত</td><td>ভালো (OneDrive হলে)</td></tr>
+<tr><td>QUERY, IMPORTRANGE</td><td>আছে</td><td>নেই — Power Query দিয়ে করা হয়</td></tr>
+<tr><td>Power Query, Power Pivot</td><td>নেই</td><td><strong>আছে — Excel-এর সবচেয়ে বড় শক্তি</strong></td></tr>
+<tr><td>Macro / স্বয়ংক্রিয়করণ</td><td>Apps Script (JavaScript)</td><td>VBA + Office Scripts</td></tr>
+<tr><td>ফর্মুলায় আলাদাকারী</td><td>কমা <code>,</code></td><td>কমা <code>,</code> — তবে কিছু দেশে সেমিকোলন <code>;</code></td></tr>
+</table>
+<div class="task"><b>আজকের কাজ</b>
+Google Sheets থেকে আপনার <strong>Project 1 (Payroll)</strong> ফাইলটা নামিয়ে নিন: <em>File → Download → Microsoft Excel (.xlsx)</em>। এখন Excel-এ খুলুন এবং খুঁজে দেখুন — <br>১) সব ফর্মুলা টিকে আছে কি না <br>২) Conditional formatting ঠিক আছে কি না <br>৩) কোনো কিছু ভেঙেছে কি না (SPARKLINE বা QUERY থাকলে ভাঙবে — এটাই দেখার বিষয়) <br>৪) Excel-এ Freeze Panes কোথায় আছে খুঁজে বের করুন (View ট্যাবে) <br>৫) <kbd>Alt</kbd> চেপে দেখুন কীভাবে কীবোর্ড দিয়ে মেনু ঘোরা যায়</div>`},
+
+  {n:22,t:"Excel শর্টকাট ও যে জিনিসগুলো শুধু Excel-এ আছে",g:"গতি দ্বিগুণ করা। Flash Fill, Paste Special, Go To Special — এগুলো Sheets-এ নেই।",
+  html:`
+<h5>যে ২০টা শর্টকাট আসল পার্থক্য গড়ে দেয়</h5>
+<table>
+<tr><th>শর্টকাট</th><th>কাজ</th></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>T</kbd></td><td>Range-কে Table বানানো (কাল বিস্তারিত)</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd></td><td>Filter চালু/বন্ধ</td></tr>
+<tr><td><kbd>Alt</kbd>+<kbd>=</kbd></td><td>AutoSum</td></tr>
+<tr><td><kbd>F4</kbd></td><td>$ যোগ করা (ফর্মুলায়) / শেষ কাজ আবার করা</td></tr>
+<tr><td><kbd>F2</kbd></td><td>ঘরের ভেতরে গিয়ে এডিট করা</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>1</kbd></td><td>Format Cells ডায়ালগ — সবচেয়ে কাজের একটা</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>;</kbd></td><td>আজকের তারিখ বসানো (স্থায়ী, বদলাবে না)</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>উপরের ঘরটা নিচে কপি</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>R</kbd></td><td>বাঁ দিকের ঘরটা ডানে কপি</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd></td><td>Paste Special খোলা</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>PgUp/PgDn</kbd></td><td>শিট বদলানো</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>+</kbd></td><td>সারি/কলাম ঢোকানো</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>-</kbd></td><td>সারি/কলাম মোছা</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>&#96;</kbd></td><td>সব ফর্মুলা দেখানো/লুকানো — ভুল খোঁজার সেরা উপায়</td></tr>
+<tr><td><kbd>F9</kbd></td><td>ফর্মুলার একটা অংশ সিলেক্ট করে চাপলে সেই অংশের ফল দেখায়</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>[</kbd></td><td>ফর্মুলা যে ঘর ধরে আছে সেখানে লাফ দেওয়া</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>End</kbd></td><td>ডেটার একদম শেষ কোনায় যাওয়া</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>End</kbd></td><td>এখান থেকে শেষ পর্যন্ত সব সিলেক্ট</td></tr>
+<tr><td><kbd>Alt</kbd>+<kbd>Enter</kbd></td><td>এক ঘরের ভেতরে নতুন লাইন</td></tr>
+<tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>~</kbd></td><td>General format-এ ফেরানো — লুকানো সমস্যা ধরতে</td></tr>
+</table>
+<div class="note"><b>শেখার নিয়ম</b>
+২০টা একদিনে না। প্রতিদিন <strong>৩টা</strong> বেছে নিন এবং সেদিন মাউস দিয়ে ওই কাজগুলো করা <strong>নিষিদ্ধ</strong> করে দিন নিজের জন্য। এক সপ্তাহে হাতে বসে যাবে।</p></div>
+
+<h5>Flash Fill — Excel-এর জাদু (Sheets-এ নেই)</h5>
+<p>Excel আপনার প্যাটার্ন দেখে বাকিটা নিজে বুঝে ফেলে। ফর্মুলা লাগে না।</p>
+<ol class="steps">
+<li>A কলামে পুরো নাম আছে: <code>Rahim Uddin Ahmed</code></li>
+<li>B1-এ হাতে লিখুন <code>Rahim</code></li>
+<li>B2-এ লিখতে শুরু করলেই Excel বাকিটা ধূসর করে দেখাবে</li>
+<li><kbd>Ctrl</kbd>+<kbd>E</kbd> চাপুন — পুরো কলাম ভরে যাবে</li>
+</ol>
+<p>এটা দিয়ে যা করা যায়: নাম ভাঙা, ইমেইল বানানো, ফোন নম্বরে ড্যাশ বসানো, তারিখ পুনর্গঠন, লেখার মধ্যে থেকে অংশ টেনে আনা।</p>
+<div class="warn"><b>কিন্তু সাবধান</b>
+Flash Fill <strong>জীবন্ত নয়</strong> — একবার ভরার পর মূল ডেটা বদলালে এটা আপডেট হবে না। শুধু একবারের কাজে ব্যবহার করুন। বারবার আপডেট দরকার হলে ফর্মুলা (দিন ৭) বা Power Query (দিন ২৭) ব্যবহার করুন।</div>
+
+<h5>Paste Special — সবচেয়ে অবহেলিত শক্তিশালী টুল</h5>
+<p><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>V</kbd> চাপলে যা যা পাবেন:</p>
+<ul>
+<li><strong>Values</strong> — শুধু মান, ফর্মুলা বাদ। রিপোর্ট চূড়ান্ত করতে জরুরি।</li>
+<li><strong>Formats</strong> — শুধু সাজসজ্জা কপি</li>
+<li><strong>Transpose</strong> — সারিকে কলাম, কলামকে সারি বানানো</li>
+<li><strong>Values &amp; Number Formats</strong> — মান ও ফরম্যাট, ফর্মুলা ছাড়া</li>
+<li><strong>Operation → Multiply</strong> — একটা ঘরে <code>1000</code> লিখে কপি করে, একগুচ্ছ ঘরে Paste Special → Multiply দিলে সব ১০০০ গুণ হয়ে যাবে। হাজার থেকে টাকায় রূপান্তর এক ক্লিকে।</li>
+</ul>
+
+<h5>Go To Special — লুকানো সমস্যা ধরার টুল</h5>
+<p><kbd>Ctrl</kbd>+<kbd>G</kbd> → <strong>Special</strong>। এখান থেকে</p>
+<ul>
+<li><strong>Blanks</strong> — সব খালি ঘর একসাথে সিলেক্ট হবে। তারপর <code>0</code> লিখে <kbd>Ctrl</kbd>+<kbd>Enter</kbd> চাপলে সব খালি ঘরে ০ বসে যাবে।</li>
+<li><strong>Formulas</strong> — সব ফর্মুলার ঘর সিলেক্ট। তারপর একসাথে রং দিয়ে চিহ্নিত করে রাখুন।</li>
+<li><strong>Constants</strong> — সব হাতে লেখা মান। কোথায় হার্ডকোড করা আছে খুঁজে পাবেন।</li>
+<li><strong>Visible cells only</strong> — ফিল্টার করা অবস্থায় শুধু যা দেখা যাচ্ছে তা কপি করতে</li>
+<li><strong>Row differences</strong> — দুইটা কলাম মিলিয়ে দেখতে</li>
+</ul>
+
+<h5>ফর্মুলার ভুল খোঁজার তিনটা টুল (Formulas ট্যাবে)</h5>
+<ul>
+<li><strong>Trace Precedents</strong> — এই ঘর কোন কোন ঘর থেকে মান নিচ্ছে, তীর দিয়ে দেখায়</li>
+<li><strong>Trace Dependents</strong> — এই ঘরের উপর কোন কোন ঘর নির্ভর করছে</li>
+<li><strong>Evaluate Formula</strong> — ধাপে ধাপে দেখায় ফর্মুলা কীভাবে হিসাব করছে। জটিল Nested IF ঠিক করতে অমূল্য।</li>
+</ul>
+<div class="task"><b>আজকের কাজ</b>
+Excel-এ একটা নতুন ফাইলে ২০টা পুরো নাম লিখুন। এখন <br>১) Flash Fill দিয়ে First Name, Last Name আলাদা করুন <br>২) Flash Fill দিয়ে <code>firstname.lastname@company.com</code> ফরম্যাটে ইমেইল বানান <br>৩) কিছু ঘর খালি রাখুন, তারপর Go To Special → Blanks দিয়ে সবগুলোতে একসাথে "N/A" বসান <br>৪) একটা টেবিল বানিয়ে Paste Special → Transpose দিয়ে উল্টে দিন <br>৫) একটা জটিল Nested IF লিখে Evaluate Formula দিয়ে ধাপে ধাপে দেখুন কীভাবে হিসাব হচ্ছে</div>`},
+
+  {n:23,t:"Excel Table ও Named Range — ফর্মুলা যেন কখনো না ভাঙে",g:"Ctrl+T. একটা শর্টকাট যা আপনার কাজের ধরন বদলে দেবে।",
+  html:`
+<h5>সমস্যাটা</h5>
+<p>আপনি লিখলেন <code>=SUM(D2:D100)</code>। এখন ১০১ নম্বর সারিতে নতুন ডেটা এল — আপনার যোগফল সেটা ধরল না। এভাবে চুপচাপ ভুল রিপোর্ট তৈরি হয়। প্রতিবার ফর্মুলা ঠিক করা মানে প্রতিবার ভুলে যাওয়ার সুযোগ।</p>
+<p>সমাধান: <strong>Excel Table</strong>। এটা নিজে থেকে বেড়ে যায়।</p>
+
+<h5>Table বানানো</h5>
+<ol class="steps">
+<li>ডেটার যেকোনো ঘরে ক্লিক করুন</li>
+<li><kbd>Ctrl</kbd>+<kbd>T</kbd> চাপুন</li>
+<li>"My table has headers" টিক আছে কি না দেখে OK</li>
+<li>উপরে <strong>Table Design</strong> ট্যাব আসবে — সেখানে <strong>Table Name</strong> দিন, যেমন <code>tblSales</code></li>
+</ol>
+<div class="note"><b>নাম দেওয়ার অভ্যাস করুন</b>
+ডিফল্ট নাম হয় <code>Table1</code>, <code>Table2</code> — ৩ মাস পরে আপনি নিজেই বুঝবেন না কোনটা কী। সবসময় <code>tbl</code> দিয়ে শুরু করে অর্থপূর্ণ নাম দিন: <code>tblSales</code>, <code>tblEmployees</code>, <code>tblProducts</code>।</div>
+
+<h5>Table কী কী নিজে করে দেয়</h5>
+<ul>
+<li><strong>নিজে বেড়ে যায়</strong> — শেষ সারির নিচে টাইপ করলেই Table বড় হয়, সব ফর্মুলা-ফরম্যাট নতুন সারিতে চলে আসে</li>
+<li><strong>ফর্মুলা নিজে ছড়ায়</strong> — এক ঘরে ফর্মুলা লিখলে পুরো কলামে বসে যায়, টানতে হয় না</li>
+<li><strong>হেডার আটকে থাকে</strong> — স্ক্রল করলে কলামের নাম উপরে থেকে যায়, Freeze লাগে না</li>
+<li><strong>Filter নিজে থেকেই থাকে</strong></li>
+<li><strong>Total Row</strong> — Table Design → Total Row টিক দিলে নিচে যোগফলের সারি আসে, ড্রপডাউন থেকে SUM/AVERAGE/COUNT বদলানো যায়</li>
+<li><strong>Alternating রং</strong> নিজে থেকেই থাকে</li>
+<li><strong>Pivot Table ও Chart নিজে আপডেট হয়</strong> — নতুন সারি এলে রিফ্রেশে ধরে ফেলে</li>
+</ul>
+
+<h5>Structured Reference — পড়া যায় এমন ফর্মুলা</h5>
+<p>Table-এর ভেতরে ফর্মুলা লিখলে Excel কলামের <strong>নাম</strong> ব্যবহার করে, ঘরের ঠিকানা নয়:</p>
+<div class="fx"><code>সাধারণ:  =SUM(D2:D100)
+Table-এ: =SUM(tblSales[Sales])
+
+সাধারণ:  =E2*F2
+Table-এ: =[@Qty]*[@UnitPrice]
+
+=SUMIFS(tblSales[Sales], tblSales[Region], "Dhaka")
+=SUBTOTAL(109, tblSales[Sales])       ফিল্টার করা অবস্থায় শুধু দৃশ্যমানগুলো যোগ</code></div>
+<table>
+<tr><th>লেখা</th><th>মানে</th></tr>
+<tr><td><code>tblSales[Sales]</code></td><td>Sales কলামের সব ডেটা</td></tr>
+<tr><td><code>[@Sales]</code></td><td>এই সারির Sales ঘরটা</td></tr>
+<tr><td><code>tblSales[#All]</code></td><td>হেডার ও Total সহ পুরোটা</td></tr>
+<tr><td><code>tblSales[#Headers]</code></td><td>শুধু হেডার সারি</td></tr>
+<tr><td><code>tblSales[[Qty]:[Sales]]</code></td><td>Qty থেকে Sales পর্যন্ত কলামগুলো</td></tr>
+</table>
+<p><code>=SUM(tblSales[Sales])</code> পড়ে যে কেউ বুঝবে কী হচ্ছে। <code>=SUM(D2:D100)</code> পড়ে কেউ কিছু বুঝবে না — এমনকি ৬ মাস পরে আপনি নিজেও।</p>
+
+<h5>SUBTOTAL — ফিল্টার-সচেতন যোগফল</h5>
+<div class="fx"><code>=SUBTOTAL(109, D2:D100)     ফিল্টারে লুকানো সারি বাদ দিয়ে যোগ
+=SUBTOTAL(9, D2:D100)       লুকানো সারিও যোগ করে
+=SUBTOTAL(101, D2:D100)     গড় (দৃশ্যমান শুধু)
+=SUBTOTAL(103, D2:D100)     COUNTA (দৃশ্যমান শুধু)</code></div>
+<p>নিয়ম: <strong>১০০-এর ঘরের কোডগুলো</strong> (109, 101, 103) লুকানো সারি বাদ দেয়। এক ডিজিটের কোডগুলো (9, 1, 3) দেয় না। ফিল্টার করে যোগফল দেখতে চাইলে সবসময় ১০৯।</p>
+
+<h5>Named Range — গুরুত্বপূর্ণ ঘরের নাম দেওয়া</h5>
+<ol class="steps">
+<li>ঘর সিলেক্ট করে বাঁ দিকের Name Box-এ নাম লিখে Enter — সবচেয়ে দ্রুত</li>
+<li>বা <em>Formulas → Define Name</em></li>
+<li>সব নাম দেখতে ও ঠিক করতে: <em>Formulas → Name Manager</em> (<kbd>Ctrl</kbd>+<kbd>F3</kbd>)</li>
+</ol>
+<div class="fx"><code>$H$1-এর বদলে:  =B2*VATRate
+$C$20-এর বদলে: =B2/TotalSales</code></div>
+<p>নামের নিয়ম: স্পেস চলবে না (আন্ডারস্কোর বা CamelCase ব্যবহার করুন), সংখ্যা দিয়ে শুরু করা যাবে না, আর <code>A1</code> বা <code>SUM</code> এমন নাম দেওয়া যাবে না।</p>
+<div class="warn"><b>Table-এর একটা সীমা</b>
+Table-এর ভেতরে <strong>merged cell রাখা যায় না</strong> — আর এটা আসলে ভালো ব্যাপার (দিন ৩ মনে করুন)। তবে খেয়াল রাখুন: Table-এর ভেতরে <code>$</code> দিয়ে Absolute reference একটু ভিন্নভাবে কাজ করে, আর একই Table-এর দুই সারির মধ্যে সম্পর্ক (যেমন আগের সারির সাথে তুলনা) করতে হলে সাধারণ reference-ই ভালো।</div>
+<div class="task"><b>আজকের কাজ</b>
+Excel-এ ১০০ সারির বিক্রির ডেটা নিন (Day 16 থেকে কপি করতে পারেন)। <br>১) <kbd>Ctrl</kbd>+<kbd>T</kbd> দিয়ে Table বানান, নাম দিন <code>tblSales</code> <br>২) একটা Calculated কলাম যোগ করুন: <code>=[@Qty]*[@UnitPrice]</code> — দেখুন পুরো কলামে নিজে ছড়িয়ে গেছে <br>৩) Total Row চালু করুন <br>৪) Table-এর শেষে ৫টা নতুন সারি যোগ করুন — দেখুন সব নিজে আপডেট হচ্ছে <br>৫) VAT rate-এর জন্য একটা Named Range বানান এবং ফর্মুলায় ব্যবহার করুন <br>৬) SUBTOTAL(109) দিয়ে যোগফল বসিয়ে ফিল্টার করে দেখুন সংখ্যা বদলাচ্ছে</div>`},
+
+  {n:24,t:"Excel-এ Conditional Formatting ও Validation (উঁচু স্তর)",g:"Data Bar, Icon Set, Colour Scale, নির্ভরশীল ড্রপডাউন, কাস্টম এরর মেসেজ।",
+  html:`
+<h5>Excel-এ যা বেশি আছে</h5>
+<p>Sheets-এ Conditional Formatting দিয়ে রং বদলানো যায়। Excel-এ তার উপরে <strong>Data Bar, Icon Set, Top/Bottom rules</strong> — এগুলো ঘরের ভেতরেই ছোট চার্ট বসিয়ে দেয়।</p>
+<p><em>Home → Conditional Formatting</em> থেকে:</p>
+<table>
+<tr><th>ধরন</th><th>কী করে</th><th>কখন</th></tr>
+<tr><td><strong>Data Bars</strong></td><td>ঘরের ভেতরে বারের মতো দৈর্ঘ্য</td><td>সংখ্যার তুলনা এক নজরে</td></tr>
+<tr><td><strong>Colour Scales</strong></td><td>মান অনুযায়ী রঙের ঢাল</td><td>বেশি-কম চিহ্নিত করা</td></tr>
+<tr><td><strong>Icon Sets</strong></td><td>তীর, ট্রাফিক লাইট, তারা</td><td>স্টেটাস দেখানো</td></tr>
+<tr><td><strong>Top/Bottom Rules</strong></td><td>শীর্ষ ১০, নিচের ১০%, গড়ের উপরে</td><td>দ্রুত বিশ্লেষণ</td></tr>
+<tr><td><strong>Highlight Cell Rules</strong></td><td>বড়/ছোট/সমান/লেখা আছে/ডুপ্লিকেট</td><td>সাধারণ কাজ</td></tr>
+<tr><td><strong>New Rule → Formula</strong></td><td>যেকোনো শর্ত</td><td>যখন উপরের কোনোটা যথেষ্ট নয়</td></tr>
+</table>
+<div class="note"><b>Data Bar-এর একটা কৌশল</b>
+Data Bar দেওয়ার পর <em>Manage Rules → Edit Rule</em> খুলে <strong>"Show Bar Only"</strong> টিক দিন। তাহলে সংখ্যা লুকিয়ে যাবে, শুধু বার থাকবে — ড্যাশবোর্ডে দুর্দান্ত দেখায়। পাশের কলামে সংখ্যাটা আলাদা রাখুন।</div>
+
+<h5>যে কাস্টম ফর্মুলাগুলো বেশি লাগে</h5>
+<p><em>New Rule → Use a formula to determine which cells to format</em></p>
+<div class="fx"><code>=$E2&lt;40                             ফেল করা সারি
+=$G2&lt;$F2                            টার্গেটের নিচে
+=AND($D2&lt;&gt;"",$D2&lt;TODAY())           তারিখ পার হয়েছে
+=COUNTIF($B$2:$B$200,$B2)&gt;1         ডুপ্লিকেট
+=$H2="Cancelled"                    বাতিল হওয়া অর্ডার
+=ISBLANK($C2)                       খালি ঘর
+=MOD(ROW(),2)=0                     এক সারি ছেড়ে ছেড়ে
+=$B2=MAX($B$2:$B$200)               সবচেয়ে বড় মানের সারি
+=WEEKDAY($A2,2)&gt;5                   সপ্তাহান্তের সারি</code></div>
+<div class="warn"><b>পুরো সারি রঙিন করার নিয়ম (আবার মনে করুন)</b>
+"Applies to" ঘরে দিন <code>=$A$2:$H$200</code> (পুরো টেবিল), আর ফর্মুলায় শুধু কলামে ডলার — <code>=$E2&lt;40</code>। ডলার সারিতে দিলে সব সারি একই সিদ্ধান্ত নেবে, যা ভুল।</div>
+
+<h5>নিয়মের ক্রম ও Stop If True</h5>
+<p><em>Conditional Formatting → Manage Rules</em>। এখানে</p>
+<ul>
+<li>নিয়মগুলো <strong>উপর থেকে নিচে</strong> পড়া হয়। উপরের নিয়ম আগে প্রয়োগ হয়।</li>
+<li>তীর দিয়ে ক্রম বদলাতে পারবেন — গুরুত্বপূর্ণ নিয়ম উপরে রাখুন।</li>
+<li><strong>Stop If True</strong> টিক দিলে ওই নিয়ম মিললে নিচের নিয়মগুলো আর দেখা হবে না। একসাথে অনেক রং মিশে যাওয়া আটকাতে এটা ব্যবহার করুন।</li>
+</ul>
+
+<h5>Data Validation — Excel-এর অতিরিক্ত সুবিধা</h5>
+<p><em>Data → Data Validation</em>। Sheets-এর চেয়ে বেশি যা আছে:</p>
+<ul>
+<li><strong>Input Message</strong> — ঘরে ক্লিক করলেই একটা ছোট নির্দেশনা ভেসে উঠবে</li>
+<li><strong>Error Alert</strong> — তিন ধরন: <em>Stop</em> (একদম নেবে না), <em>Warning</em> (জিজ্ঞেস করবে), <em>Information</em> (জানাবে শুধু)। নিজের লেখা মেসেজ দিতে পারবেন।</li>
+<li><strong>Circle Invalid Data</strong> — নিয়ম বসানোর <strong>আগে</strong> যে ভুল ডেটা ঢুকে গেছে, সেগুলো লাল গোল দিয়ে দেখায়। খুব কাজের।</li>
+</ul>
+
+<h5>নির্ভরশীল ড্রপডাউন (Dependent Dropdown)</h5>
+<p>Division বাছলে শুধু সেই Division-এর District দেখাবে — এটা ইন্টারভিউতে জিজ্ঞেস করা হয়।</p>
+<ol class="steps">
+<li>একটা শিটে প্রতিটা Division-এর জন্য একটা কলাম বানান, প্রতিটা কলামে সেই Division-এর District</li>
+<li>প্রতিটা কলামকে আলাদা Named Range দিন, নাম হবে হুবহু Division-এর নাম (স্পেস থাকলে আন্ডারস্কোর)</li>
+<li>Division-এর ঘরে সাধারণ List validation দিন</li>
+<li>District-এর ঘরে List validation-এর Source-এ লিখুন: <code>=INDIRECT(A2)</code></li>
+</ol>
+<p><code>INDIRECT</code> A2-এর লেখাটাকে একটা Named Range-এর নাম হিসেবে পড়ে — তাই A2 বদলালে তালিকাও বদলায়।</p>
+<div class="fx"><code>=INDIRECT(SUBSTITUTE(A2," ","_"))    নামে স্পেস থাকলে এই সংস্করণ</code></div>
+<div class="task"><b>আজকের কাজ</b>
+একটা <strong>Project Tracker</strong> বানান Excel-এ: Task, Owner, Division, District, Priority, Progress%, StartDate, DueDate, Status। <br>১) Progress% কলামে <strong>Data Bar</strong> দিন, "Show Bar Only" চালু করুন <br>২) Priority কলামে <strong>Icon Set</strong> (ট্রাফিক লাইট) দিন <br>৩) DueDate পার হয়েছে ও Status ≠ Done হলে পুরো সারি লাল করুন <br>৪) Progress = 100% হলে পুরো সারি সবুজ ও ধূসর করুন — এবং <strong>Stop If True</strong> দিয়ে লাল নিয়মটা এখানে আটকে দিন <br>৫) Division → District নির্ভরশীল ড্রপডাউন বানান (কমপক্ষে ৩টা Division) <br>৬) Progress-এ ০–১০০-এর বাইরে লিখলে নিজের লেখা এরর মেসেজ দেখান</div>`},
+
+  {n:25,t:"Excel Pivot Table — Slicer, Timeline, GETPIVOTDATA",g:"Sheets-এর Pivot-এর চেয়ে অনেক বেশি ক্ষমতা। রিপোর্টিং চাকরির প্রাণ।",
+  html:`
+<h5>বানানোর নিয়ম</h5>
+<ol class="steps">
+<li>ডেটাকে আগে Table বানান (<kbd>Ctrl</kbd>+<kbd>T</kbd>) — তাহলে নতুন সারি এলে Pivot নিজে ধরবে</li>
+<li>Table-এ ক্লিক করে <em>Insert → PivotTable → New Worksheet</em></li>
+<li>ডান দিকের PivotTable Fields প্যানেলে ফিল্ড টেনে খোপে ফেলুন: <strong>Rows, Columns, Values, Filters</strong></li>
+<li>ডেটা বদলালে <em>PivotTable Analyze → Refresh</em> (<kbd>Alt</kbd>+<kbd>F5</kbd>)</li>
+</ol>
+<div class="warn"><b>Pivot নিজে থেকে আপডেট হয় না</b>
+মূল ডেটা বদলালেও Pivot পুরোনো সংখ্যা দেখাবে যতক্ষণ Refresh না করবেন। এটা Google Sheets-এর সাথে বড় পার্থক্য — ওখানে নিজে হয়ে যায়। <br><strong>স্থায়ী সমাধান:</strong> ডান-ক্লিক → PivotTable Options → Data → "Refresh data when opening the file" টিক দিন।</div>
+
+<h5>Value Field Settings — সংখ্যাকে যেভাবে চান</h5>
+<p>Values-এর কোনো ফিল্ডে ডান-ক্লিক → <em>Value Field Settings</em>:</p>
+<ul>
+<li><strong>Summarize Values By</strong> — Sum, Count, Average, Max, Min, Product, StdDev</li>
+<li><strong>Show Values As</strong> — এখানেই আসল শক্তি:</li>
+</ul>
+<table>
+<tr><th>অপশন</th><th>কী দেখায়</th></tr>
+<tr><td>% of Grand Total</td><td>মোটের কত শতাংশ</td></tr>
+<tr><td>% of Column / Row Total</td><td>কলাম বা সারির ভেতরে ভাগ</td></tr>
+<tr><td><strong>% of Parent Row Total</strong></td><td>উপরের গুচ্ছের কত শতাংশ — একাধিক স্তরে দুর্দান্ত</td></tr>
+<tr><td><strong>Difference From</strong></td><td>আগের মাসের চেয়ে কত বেড়েছে/কমেছে</td></tr>
+<tr><td><strong>% Difference From</strong></td><td>বৃদ্ধির হার — মাসিক গ্রোথ রিপোর্টে অপরিহার্য</td></tr>
+<tr><td><strong>Running Total In</strong></td><td>জমতে থাকা যোগফল — YTD (Year to Date)</td></tr>
+<tr><td><strong>Rank Largest to Smallest</strong></td><td>র‍্যাংক নম্বর বসিয়ে দেয়</td></tr>
+</table>
+<div class="note"><b>মনে রাখার মতো</b>
+"গত মাসের চেয়ে এই মাসে কত % বেড়েছে" — এটা ফর্মুলা দিয়ে করতে গেলে অনেক খাটনি। Pivot-এ <strong>% Difference From → Previous</strong> বাছলেই হয়ে যায়। এটা জানলে ঘণ্টার কাজ মিনিটে হবে।</div>
+
+<h5>Grouping — তারিখ ও সংখ্যা গোছানো</h5>
+<ul>
+<li><strong>তারিখ:</strong> Rows-এ তারিখ দিয়ে ডান-ক্লিক → Group → Months, Quarters, Years একসাথে বাছুন। Excel নিজেই Year ও Quarter ফিল্ড বানিয়ে দেবে।</li>
+<li><strong>সংখ্যা:</strong> বয়স বা দামের ঘরে ডান-ক্লিক → Group → ব্যবধান দিন (যেমন ১০)। ফলে ২০-২৯, ৩০-৩৯ এভাবে গুচ্ছ হবে।</li>
+<li><strong>হাতে গুচ্ছ:</strong> কয়েকটা সারি সিলেক্ট করে ডান-ক্লিক → Group → নাম দিন। যেমন ৪টা জেলা মিলিয়ে "উত্তরাঞ্চল"।</li>
+</ul>
+
+<h5>Slicer ও Timeline — ইন্টারঅ্যাক্টিভ ফিল্টার</h5>
+<ol class="steps">
+<li>Pivot-এ ক্লিক করে <em>PivotTable Analyze → Insert Slicer</em> → ফিল্ড বাছুন</li>
+<li>তারিখের জন্য <em>Insert Timeline</em> — একটা টাইমলাইন স্লাইডার আসবে, দিন/মাস/কোয়ার্টার/বছর ধরে টেনে দেখা যাবে</li>
+<li><strong>একটা Slicer দিয়ে অনেক Pivot নিয়ন্ত্রণ:</strong> Slicer-এ ডান-ক্লিক → <em>Report Connections</em> → যেসব Pivot নিয়ন্ত্রণ করতে চান টিক দিন</li>
+<li>Slicer-এর চেহারা বদলাতে: Slicer ট্যাব → Columns সংখ্যা বাড়ান, Style বদলান</li>
+</ol>
+<p>এই Report Connections-এর জিনিসটাই ড্যাশবোর্ড বানানোর মূল কৌশল (দিন ২৯)।</p>
+
+<h5>Calculated Field</h5>
+<p><em>PivotTable Analyze → Fields, Items &amp; Sets → Calculated Field</em></p>
+<div class="fx"><code>নাম: Profit Margin      ফর্মুলা: =Profit/Sales
+নাম: Achievement        ফর্মুলা: =Sales/Target
+নাম: Avg Price          ফর্মুলা: =Sales/Qty</code></div>
+<div class="warn"><b>একটা ফাঁদ</b>
+Calculated Field <strong>যোগফলের উপর</strong> হিসাব করে, প্রতিটা সারিতে আলাদা করে নয়। তাই গড় বা অনুপাতের ক্ষেত্রে ফল অপ্রত্যাশিত হতে পারে। সঠিক করতে চাইলে মূল ডেটাতেই একটা সাহায্যকারী কলাম বানিয়ে নিন — সেটা সবসময় নিরাপদ।</div>
+
+<h5>GETPIVOTDATA — Pivot থেকে নির্দিষ্ট সংখ্যা টানা</h5>
+<p>Pivot-এর কোনো ঘরে <code>=</code> লিখে ক্লিক করলে Excel নিজেই এটা লিখে দেয়:</p>
+<div class="fx"><code>=GETPIVOTDATA("Sales", $A$3, "Region", "Dhaka", "Month", "Jul")</code></div>
+<p>এটা সাধারণ ঘরের রেফারেন্সের চেয়ে ভালো — কারণ Pivot রিফ্রেশ হয়ে সারি এদিক-সেদিক সরলেও এটা ঠিক জিনিসটাই আনবে। ড্যাশবোর্ডের KPI কার্ডে এটাই ব্যবহার করবেন।</p>
+<div class="note"><b>Pivot Table পরিষ্কার দেখানোর সেটিংস</b>
+<em>Design → Report Layout → Show in Tabular Form</em> (নেস্টেড ইনডেন্টের বদলে সোজা টেবিল)। <em>Design → Subtotals → Do Not Show Subtotals</em>। ডান-ক্লিক → PivotTable Options → Layout → "For empty cells show" ঘরে <code>0</code> লিখুন। এই তিনটা করলেই Pivot দেখতে রিপোর্টের মতো লাগবে।</div>
+<div class="task"><b>আজকের কাজ</b>
+Excel-এ ২০০ সারির বিক্রির ডেটা Table বানিয়ে ৬টা Pivot বানান: <br>১) Region × Month ক্রস টেবিল <br>২) মাসিক বিক্রি + <strong>% Difference From Previous</strong> (গ্রোথ) <br>৩) Running Total দিয়ে YTD বিক্রি <br>৪) Salesperson-এর র‍্যাংক (Rank Largest to Smallest) <br>৫) Calculated Field দিয়ে Profit Margin <br>৬) Product অনুযায়ী শীর্ষ ১০ <br>শেষে একটা নতুন শিটে সব Pivot এনে <strong>একটা Slicer</strong> দিয়ে Report Connections ব্যবহার করে সবগুলো একসাথে নিয়ন্ত্রণ করুন। একটা Timeline-ও বসান।</div>`},
+
+  {n:26,t:"Excel Lookup পরিবার ও Dynamic Array",g:"XLOOKUP, INDEX/MATCH, SUMPRODUCT, আর নতুন ফর্মুলাগুলো — FILTER, SORT, UNIQUE.",
+  html:`
+<h5>প্রথমে ভার্সন বুঝে নিন</h5>
+<table>
+<tr><th>ফাংশন</th><th>কোন ভার্সনে আছে</th></tr>
+<tr><td>VLOOKUP, INDEX, MATCH, SUMPRODUCT</td><td>সব ভার্সনে</td></tr>
+<tr><td>IFS, MAXIFS, MINIFS, TEXTJOIN, CONCAT</td><td>2019 ও পরে</td></tr>
+<tr><td>XLOOKUP, XMATCH, FILTER, SORT, UNIQUE, SEQUENCE</td><td><strong>শুধু Microsoft 365 ও 2021+</strong></td></tr>
+<tr><td>LET, LAMBDA, TEXTSPLIT, TOCOL, VSTACK</td><td>Microsoft 365 (নতুন)</td></tr>
+</table>
+<div class="warn"><b>অফিসে কাজ করার আগে জিজ্ঞেস করুন</b>
+আপনার সুন্দর XLOOKUP ফর্মুলা সহকর্মীর Excel 2016-এ <code>#NAME?</code> দেখাবে। ফাইল অন্যকে দিতে হলে <strong>INDEX+MATCH ব্যবহার করুন</strong> — এটা সব ভার্সনে চলে। নিজের কাজে XLOOKUP, শেয়ার করার ফাইলে INDEX+MATCH — এই নিয়ম মেনে চলুন।</div>
+
+<h5>XLOOKUP পুরোপুরি</h5>
+<div class="fx"><code>=XLOOKUP(খুঁজব, কোথায়, কী আনব, [না পেলে], [মিলের ধরন], [খোঁজার দিক])
+
+=XLOOKUP(A2, tblEmp[EmpID], tblEmp[Name], "পাওয়া যায়নি")
+=XLOOKUP(A2, tblEmp[EmpID], tblEmp[[Name]:[Salary]])    একসাথে অনেক কলাম!
+=XLOOKUP(A2, tblEmp[EmpID], tblEmp[Name], "", 0, -1)    নিচ থেকে খুঁজবে</code></div>
+<ul>
+<li><strong>মিলের ধরন:</strong> <code>0</code> = হুবহু (ডিফল্ট), <code>-1</code> = না পেলে ছোটটা, <code>1</code> = না পেলে বড়টা, <code>2</code> = wildcard</li>
+<li><strong>খোঁজার দিক:</strong> <code>1</code> = উপর থেকে, <code>-1</code> = নিচ থেকে (সবচেয়ে সাম্প্রতিক এন্ট্রি পেতে দুর্দান্ত)</li>
+</ul>
+<p><strong>স্তর অনুযায়ী মান বসানো</strong> — Nested IF-এর চমৎকার বিকল্প:</p>
+<div class="fx"><code>=XLOOKUP(B2, {0;40;50;60;70;80}, {"F";"C";"B";"A-";"A";"A+"}, "", -1)</code></div>
+
+<h5>SUMPRODUCT — পুরোনো Excel-এর সুইস আর্মি নাইফ</h5>
+<div class="fx"><code>=SUMPRODUCT(B2:B100, C2:C100)                       Qty × Price-এর মোট
+=SUMPRODUCT((D2:D100="Dhaka")*(E2:E100))            শর্তসহ যোগ
+=SUMPRODUCT((D2:D100="Dhaka")*(C2:C100="IT"))       শর্তসহ গণনা
+=SUMPRODUCT((YEAR(A2:A100)=2026)*(E2:E100))         বছর অনুযায়ী যোগ
+=SUMPRODUCT(--(A2:A100&lt;&gt;""))                        খালি নয় এমন ঘর গোনা</code></div>
+<p>ভেতরের গণিত: শর্ত সত্য হলে <code>TRUE</code> = ১, মিথ্যা হলে <code>FALSE</code> = ০। গুণ করলে যেগুলো শর্ত মেলে সেগুলোই থাকে, বাকিগুলো ০ হয়ে যায়। তারপর সব যোগ। <code>--</code> চিহ্নটা TRUE/FALSE-কে ১/০ বানায়।</p>
+<div class="note"><b>কেন এটা এখনো শিখবেন</b>
+SUMIFS পুরোনো Excel-এ যা করতে পারে না — যেমন শর্তে ফাংশন ব্যবহার করা (<code>YEAR()</code>, <code>MONTH()</code>) — SUMPRODUCT তা পারে। পুরোনো সিস্টেমে কাজ করলে এটাই আপনার একমাত্র উপায়।</div>
+
+<h5>Dynamic Array — একটা ফর্মুলা, অনেক ফলাফল</h5>
+<p>Microsoft 365-এ একটা ফর্মুলা লিখলে সে নিজেই যত ঘর দরকার ছড়িয়ে যায় (এটাকে "spill" বলে):</p>
+<div class="fx"><code>=UNIQUE(tblSales[Product])                       সব আলাদা পণ্য
+=SORT(UNIQUE(tblSales[Product]))                 সাজানো অবস্থায়
+=FILTER(tblSales, tblSales[Region]="Dhaka")      শুধু ঢাকার সারিগুলো
+=FILTER(tblSales, (tblSales[Region]="Dhaka")*(tblSales[Sales]&gt;50000), "কিছু নেই")
+=SORT(FILTER(A2:D100, D2:D100&gt;50000), 4, -1)     ছেঁকে নিয়ে সাজানো
+=SEQUENCE(12)                                    ১ থেকে ১২
+=TRANSPOSE(A1:A10)                               সারি ↔ কলাম
+=SORTBY(tblSales[Product], tblSales[Sales], -1)  অন্য কলাম অনুযায়ী সাজানো</code></div>
+<p><strong>Spill Reference</strong> — ফলাফলের পুরো ব্লকটাকে ডাকতে <code>#</code> ব্যবহার করুন:</p>
+<div class="fx"><code>=COUNTA(F2#)      F2-এর spill করা পুরো ফলাফলে কতগুলো আছে
+=SUM(G2#)         পুরো spill ব্লকের যোগফল</code></div>
+<div class="warn"><b>#SPILL! এরর</b>
+ফর্মুলা ছড়াতে চায় কিন্তু নিচে বা ডানে কোনো ঘরে আগে থেকেই কিছু লেখা আছে। ওই ঘরগুলো খালি করুন, নইলে ফর্মুলা কাজ করবে না। Dynamic Array ব্যবহার করলে ফলাফলের নিচে-ডানে জায়গা খালি রাখার অভ্যাস করুন।</div>
+
+<h5>LET ও LAMBDA — বড় ফর্মুলা পরিষ্কার রাখা</h5>
+<div class="fx"><code>=LET(sales, SUM(tblSales[Sales]),
+     cost,  SUM(tblSales[Cost]),
+     (sales-cost)/sales)</code></div>
+<p><code>LET</code> দিয়ে ফর্মুলার ভেতরে ভেরিয়েবল বানানো যায় — একই হিসাব বারবার লিখতে হয় না, তাই গতিও বাড়ে আর পড়তেও সহজ হয়।</p>
+<div class="task"><b>আজকের কাজ</b>
+Excel-এ একটা <strong>Employee Lookup Tool</strong> বানান। উপরে একটা ঘরে EmpID লিখবেন, নিচে সেই কর্মীর সব তথ্য দেখাবে। <br>১) XLOOKUP দিয়ে একটাই ফর্মুলায় Name থেকে Salary পর্যন্ত সব কলাম একসাথে আনুন <br>২) একই কাজ INDEX+MATCH দিয়ে করুন (পুরোনো Excel-এর জন্য) <br>৩) SUMPRODUCT দিয়ে ২০২৬ সালে যোগ দেওয়া কর্মীদের মোট বেতন বের করুন <br>৪) FILTER দিয়ে একটা ড্রপডাউনে Department বাছলে সেই বিভাগের সব কর্মীর তালিকা দেখান <br>৫) XLOOKUP-এর স্তর-ভিত্তিক পদ্ধতিতে (approximate match) নম্বর থেকে গ্রেড বের করুন</div>`}
+  ]
+},
+{
+  pn:"Phase 4 · দিন ২৭–৩০",
+  title:"উঁচু স্তর ও চাকরির জন্য প্রস্তুতি",
+  desc:"Power Query, বিশ্লেষণের টুল, পূর্ণ ড্যাশবোর্ড আর ইন্টারভিউ প্রস্তুতি। এই ৪ দিন আপনাকে ভিড় থেকে আলাদা করবে।",
+  days:[
+  {n:27,t:"Power Query — Excel-এর সবচেয়ে শক্তিশালী টুল",g:"একবার সেটআপ করলে প্রতি মাসে শুধু Refresh চাপবেন। ঘণ্টার কাজ সেকেন্ডে।",
+  html:`
+<h5>কেন এটাই সবচেয়ে দামি স্কিল</h5>
+<p>ধরুন প্রতি মাসে ৫টা CSV ফাইল আসে। আপনাকে সেগুলো খুলে, পরিষ্কার করে, জোড়া দিয়ে, রিপোর্ট বানাতে হয় — প্রতি মাসে ২ ঘণ্টা। Power Query দিয়ে <strong>একবার</strong> ধাপগুলো রেকর্ড করে রাখলে, পরের মাসে শুধু <strong>Refresh</strong> চাপবেন — ১০ সেকেন্ডে সব হয়ে যাবে।</p>
+<div class="note"><b>একটা কথায়</b>
+Power Query = ডেটা পরিষ্কার করার ধাপগুলো <strong>রেকর্ড করে রাখা</strong>। ফর্মুলা নয়, ধাপের তালিকা। নতুন ডেটা এলে সেই একই ধাপ নিজে চলে। <br><br>এই একটা স্কিল যোগ করলে আপনার CV-তে "Excel জানি" থেকে "ডেটা অটোমেশন করতে পারি" হয়ে যাবে।</div>
+<div class="warn"><b>যা লাগবে</b>
+Power Query <strong>শুধু Windows-এর ডেস্কটপ Excel-এ পূর্ণভাবে আছে</strong> (2016 ও পরে, Data ট্যাবে "Get Data")। Mac-এ সীমিত, Excel for the web-এ নেই। না থাকলে আজকের দিনটা পড়ে বুঝে রাখুন — ধারণাটা জানা থাকলে ইন্টারভিউতে কথা বলতে পারবেন।</div>
+
+<h5>শুরু করা</h5>
+<ol class="steps">
+<li><em>Data → Get Data</em> → উৎস বাছুন: From File (Excel/CSV/Text), From Folder, From Web, From Database</li>
+<li>ফাইল বাছার পর <strong>Transform Data</strong> চাপুন (Load নয়!) — Power Query Editor খুলবে</li>
+<li>ডান দিকে <strong>Applied Steps</strong> প্যানেল — প্রতিটা কাজ এখানে একটা ধাপ হিসেবে জমা হবে</li>
+<li>ভুল ধাপ হলে পাশের ✕ চেপে মুছে ফেলুন — কোনো ক্ষতি নেই</li>
+<li>কাজ শেষে <em>Home → Close &amp; Load To → Table বা PivotTable</em></li>
+</ol>
+
+<h5>যে কাজগুলো সবচেয়ে বেশি করবেন</h5>
+<table>
+<tr><th>কাজ</th><th>কোথায়</th></tr>
+<tr><td>প্রথম সারিকে হেডার বানানো</td><td>Home → Use First Row as Headers</td></tr>
+<tr><td>কলামের ডেটা টাইপ ঠিক করা</td><td>হেডারের আইকনে ক্লিক → Text/Number/Date</td></tr>
+<tr><td>অদরকারি কলাম মোছা</td><td>ডান-ক্লিক → Remove Columns</td></tr>
+<tr><td>খালি সারি মোছা</td><td>Home → Remove Rows → Remove Blank Rows</td></tr>
+<tr><td>ডুপ্লিকেট মোছা</td><td>ডান-ক্লিক → Remove Duplicates</td></tr>
+<tr><td>স্পেস পরিষ্কার</td><td>Transform → Format → Trim / Clean</td></tr>
+<tr><td>কলাম ভাঙা</td><td>Transform → Split Column → By Delimiter</td></tr>
+<tr><td>শর্তসহ নতুন কলাম</td><td>Add Column → Conditional Column (IF-এর মতো, ক্লিক করে)</td></tr>
+<tr><td>নিজের ফর্মুলার কলাম</td><td>Add Column → Custom Column</td></tr>
+<tr><td>যোগ/গড় করে গুচ্ছ করা</td><td>Transform → Group By</td></tr>
+<tr><td>খালি ঘরে উপরের মান ভরা</td><td>Transform → Fill → Down</td></tr>
+</table>
+
+<h5>Unpivot — যে ফিচারটার জন্য মানুষ Power Query শেখে</h5>
+<p>আপনি এমন টেবিল পেলেন যেখানে ১২ মাস ১২টা <strong>কলামে</strong> আছে। কিন্তু Pivot Table-এর জন্য দরকার তারিখ একটা কলামে (দিন ১৬ মনে করুন)। হাতে ঠিক করতে গেলে দিন লেগে যাবে।</p>
+<ol class="steps">
+<li>যে কলামগুলো <strong>রাখতে চান</strong> সেগুলো সিলেক্ট করুন (যেমন Product, Region)</li>
+<li>ডান-ক্লিক → <strong>Unpivot Other Columns</strong></li>
+<li>ব্যস — ১২টা মাসের কলাম দুইটা কলাম হয়ে গেল: Attribute (মাসের নাম) ও Value (সংখ্যা)</li>
+<li>কলামের নাম বদলে দিন Month ও Sales</li>
+</ol>
+<p>এই একটা ফিচার শেখার জন্যই Power Query শেখা সার্থক।</p>
+
+<h5>Append ও Merge — জোড়া দেওয়া</h5>
+<ul>
+<li><strong>Append</strong> = নিচে নিচে জোড়া (একই কলাম, বেশি সারি)। ১২ মাসের ১২টা ফাইল এক করতে। <em>Home → Append Queries</em></li>
+<li><strong>Merge</strong> = পাশে জোড়া (VLOOKUP-এর মতো, কিন্তু অনেক শক্তিশালী)। <em>Home → Merge Queries</em></li>
+</ul>
+<p>Merge-এর ধরনগুলো:</p>
+<table>
+<tr><th>Join ধরন</th><th>কী পাবেন</th></tr>
+<tr><td>Left Outer</td><td>বাঁ টেবিলের সব + যা মেলে (VLOOKUP-এর সমান)</td></tr>
+<tr><td>Inner</td><td>শুধু যেগুলো দুই টেবিলেই আছে</td></tr>
+<tr><td>Left Anti</td><td>বাঁ টেবিলের যা ডানে <strong>নেই</strong> — অমিল খোঁজার সেরা টুল</td></tr>
+<tr><td>Full Outer</td><td>দুই টেবিলের সবকিছু</td></tr>
+</table>
+<div class="note"><b>Left Anti Join-এর ব্যবহার</b>
+"Master তালিকার কোন কর্মীরা এই মাসের হাজিরায় নেই?" — Left Anti Join দিয়ে এক ক্লিকে বের হয়ে যাবে। মিলিয়ে দেখার (reconciliation) কাজে এটা অসাধারণ।</div>
+
+<h5>From Folder — সবচেয়ে বড় সময় বাঁচানোর কৌশল</h5>
+<ol class="steps">
+<li>একটা ফোল্ডারে প্রতি মাসের ফাইল রাখুন, সবগুলোর কলাম একই কাঠামোর</li>
+<li><em>Data → Get Data → From File → From Folder</em></li>
+<li>Combine &amp; Transform চাপুন — Power Query সব ফাইল এক করে দেবে</li>
+<li><strong>এবার পরের মাসে</strong> শুধু নতুন ফাইলটা ওই ফোল্ডারে রাখুন আর <em>Data → Refresh All</em> (<kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>F5</kbd>) চাপুন</li>
+</ol>
+<div class="warn"><b>শুরুতে যে ভুলটা সবাই করে</b>
+Applied Steps-এ ধাপগুলো <strong>ক্রম অনুযায়ী</strong> চলে। মাঝখানের একটা ধাপ মুছলে পরের ধাপগুলো ভেঙে যেতে পারে। ধাপের নাম বদলে অর্থপূর্ণ করুন (ডান-ক্লিক → Rename) যেন ৩ মাস পরে বুঝতে পারেন কী করেছিলেন।</div>
+<div class="task"><b>আজকের কাজ</b>
+তিনটা CSV ফাইল বানান — Jan.csv, Feb.csv, Mar.csv — একই কলাম কাঠামোয়, প্রতিটায় ২০-৩০ সারি বিক্রির ডেটা। কিছু নোংরা জিনিস ইচ্ছা করে রাখুন (বাড়তি স্পেস, খালি সারি, ডুপ্লিকেট)। এখন <br>১) একটা ফোল্ডারে রেখে From Folder দিয়ে তিনটা এক করুন <br>২) Trim, Remove Blank Rows, Remove Duplicates ধাপ যোগ করুন <br>৩) Conditional Column দিয়ে একটা Category কলাম বানান <br>৪) Custom Column দিয়ে Sales = Qty × Price বানান <br>৫) Close &amp; Load করে একটা Pivot Table বানান <br>৬) <strong>আসল পরীক্ষা:</strong> Apr.csv নামে চতুর্থ ফাইল ফোল্ডারে রেখে Refresh All চাপুন — সব নিজে আপডেট হওয়া উচিত। হলে আপনি অটোমেশন শিখে ফেলেছেন।</div>`},
+
+  {n:28,t:"বিশ্লেষণের টুল ও রিপোর্ট চূড়ান্ত করা",g:"Goal Seek, Scenario, Data Table, প্রিন্ট সেটআপ, শিট রক্ষা — যেটা ছাড়া রিপোর্ট অসম্পূর্ণ।",
+  html:`
+<h5>Goal Seek — উল্টো দিক থেকে হিসাব</h5>
+<p>সাধারণত আপনি ইনপুট দেন, ফলাফল পান। Goal Seek উল্টোটা করে: <strong>ফলাফল বলে দিন, ইনপুট কত হতে হবে সেটা বের করে দেবে।</strong></p>
+<ol class="steps">
+<li><em>Data → What-If Analysis → Goal Seek</em></li>
+<li><strong>Set cell</strong> — যে ঘরে ফর্মুলা আছে (যেমন লাভ)</li>
+<li><strong>To value</strong> — আপনি কত চান (যেমন 500000)</li>
+<li><strong>By changing cell</strong> — কোন ইনপুট বদলাবে (যেমন দাম বা পরিমাণ)</li>
+<li>OK চাপলে Excel চেষ্টা করে করে উত্তর বের করে দেবে</li>
+</ol>
+<p><strong>বাস্তব প্রশ্ন যেগুলো Goal Seek উত্তর দেয়:</strong> "৫ লাখ লাভ করতে কত ইউনিট বিক্রি করতে হবে?", "৮০% নম্বর পেতে শেষ পরীক্ষায় কত পেতে হবে?", "মাসিক কিস্তি ২০ হাজারে রাখতে ঋণের মেয়াদ কত হতে হবে?"</p>
+
+<h5>Data Table — একসাথে অনেক সম্ভাবনা</h5>
+<p>একটা বা দুইটা ইনপুট বদলালে ফলাফল কীভাবে বদলায় — একটা টেবিলে সব দেখা।</p>
+<ol class="steps">
+<li>একটা ঘরে আপনার মূল ফর্মুলা রাখুন</li>
+<li>একটা কলামে ইনপুটের বিভিন্ন মান লিখুন (যেমন বিভিন্ন দাম)</li>
+<li>একটা সারিতে দ্বিতীয় ইনপুটের মান লিখুন (যেমন বিভিন্ন পরিমাণ)</li>
+<li>দুইয়ের সংযোগের কোনার ঘরে ফর্মুলার রেফারেন্স দিন</li>
+<li>পুরো ব্লক সিলেক্ট করে <em>Data → What-If Analysis → Data Table</em></li>
+<li>Row input cell ও Column input cell দেখিয়ে OK</li>
+</ol>
+<p>ফলাফল: একটা পূর্ণ ম্যাট্রিক্স — প্রতিটা দাম ও পরিমাণের সংযোগে লাভ কত হবে। মূল্য নির্ধারণের সিদ্ধান্তে অসাধারণ।</p>
+
+<h5>Scenario Manager</h5>
+<p>তিনটা পরিস্থিতি — <strong>ভালো, স্বাভাবিক, খারাপ</strong> — সেভ করে রেখে এক ক্লিকে বদলে দেখা।</p>
+<ol class="steps">
+<li><em>Data → What-If Analysis → Scenario Manager → Add</em></li>
+<li>নাম দিন "Best Case", Changing cells দেখান, মান দিন</li>
+<li>একইভাবে "Normal" ও "Worst Case" যোগ করুন</li>
+<li><strong>Summary</strong> চাপলে তিনটা পাশাপাশি একটা তুলনামূলক রিপোর্ট তৈরি হবে</li>
+</ol>
+<div class="note"><b>ঋণের কিস্তি বের করা</b>
+<div class="fx"><code>=PMT(rate/12, years*12, -loanAmount)     মাসিক কিস্তি
+=IPMT(rate/12, 1, years*12, -amount)     প্রথম মাসের সুদ
+=PPMT(rate/12, 1, years*12, -amount)     প্রথম মাসের আসল
+=NPV(rate, values)                       ভবিষ্যৎ টাকার আজকের মূল্য
+=IRR(values)                             বিনিয়োগের রিটার্নের হার</code></div>
+ঋণের পরিমাণে মাইনাস চিহ্ন দিলে কিস্তি ইতিবাচক সংখ্যায় আসবে।</div>
+
+<h5>প্রিন্ট ও PDF — যেখানে সব রিপোর্ট নষ্ট হয়</h5>
+<p><em>Page Layout</em> ট্যাব:</p>
+<ul>
+<li><strong>Orientation</strong> — কলাম বেশি হলে Landscape</li>
+<li><strong>Print Area</strong> — শুধু যেটুকু চান সেটা সিলেক্ট করে Set Print Area</li>
+<li><strong>Print Titles → Rows to repeat at top</strong> — প্রতিটা পাতায় হেডার সারি আসবে। এটা না দিলে ৫ পাতার রিপোর্টের ২ নম্বর পাতা থেকে কেউ বুঝবে না কোন কলাম কী।</li>
+<li><strong>Scale to Fit → Width: 1 page</strong> — সব কলাম এক পাতার চওড়ায় ঢুকবে</li>
+<li><strong>Breaks → Insert Page Break</strong> — কোথায় পাতা ভাঙবে নিজে ঠিক করুন</li>
+<li><strong>Header &amp; Footer</strong> — পাতা নম্বর, তারিখ, ফাইলের নাম বসান</li>
+<li><kbd>Ctrl</kbd>+<kbd>P</kbd> দিয়ে <strong>প্রিন্ট প্রিভিউ অবশ্যই দেখুন</strong> — না দেখে পাঠালে বিব্রত হবেন</li>
+</ul>
+
+<h5>শিট রক্ষা করা</h5>
+<ol class="steps">
+<li>প্রথমে <strong>যে ঘরগুলো মানুষ বদলাতে পারবে</strong> সেগুলো সিলেক্ট করুন</li>
+<li><kbd>Ctrl</kbd>+<kbd>1</kbd> → Protection ট্যাব → <strong>Locked-এর টিক তুলে দিন</strong></li>
+<li>এখন <em>Review → Protect Sheet</em> → পাসওয়ার্ড দিন (বা খালি রাখুন) → OK</li>
+<li>ফলাফল: শুধু আনলক করা ঘরগুলোতে লেখা যাবে, বাকি সব সুরক্ষিত</li>
+</ol>
+<p><em>Review → Protect Workbook</em> দিলে শিট যোগ/মোছা/নাম বদলানো বন্ধ হবে।</p>
+<div class="warn"><b>স্পষ্ট করে বলি</b>
+Excel-এর শিট পাসওয়ার্ড <strong>আসল নিরাপত্তা নয়</strong> — অনলাইনে টুল দিয়ে ভাঙা যায়। এটা শুধু <strong>ভুলবশত বদলে ফেলা আটকায়</strong>। সত্যিকারের গোপনীয় তথ্য হলে <em>File → Info → Protect Workbook → Encrypt with Password</em> ব্যবহার করুন — এটা পুরো ফাইল এনক্রিপ্ট করে, এবং পাসওয়ার্ড হারালে ফাইল আর কোনোদিন খুলবে না।</div>
+
+<h5>রিপোর্ট পাঠানোর আগে ৮টা চেক</h5>
+<ul>
+<li>কোনো <code>#REF!</code>, <code>#N/A</code>, <code>#DIV/0!</code> নেই — <kbd>Ctrl</kbd>+<kbd>F</kbd> দিয়ে <code>#</code> খুঁজে দেখুন</li>
+<li>সব সংখ্যায় ঠিক Number Format (হাজারে কমা, দশমিক ঘর একই রকম)</li>
+<li>প্রতিটা শিটের নাম অর্থপূর্ণ, "Sheet1" নয়</li>
+<li>সব Pivot Table একবার Refresh করা হয়েছে</li>
+<li>ফাইল খুললে <strong>A1 ঘরে</strong> কার্সর থাকে (প্রতিটা শিটে <kbd>Ctrl</kbd>+<kbd>Home</kbd> চেপে সেভ করুন)</li>
+<li>কোনো লুকানো সারি/কলাম নেই যা বিভ্রান্তি তৈরি করবে</li>
+<li>প্রিন্ট প্রিভিউ দেখা হয়েছে</li>
+<li>একটা "Notes" শিট আছে যেখানে লেখা — ডেটা কোথা থেকে এসেছে, কখন আপডেট হয়েছে, কী কী ধরে নেওয়া হয়েছে</li>
+</ul>
+<div class="task"><b>আজকের কাজ</b>
+একটা <strong>Break-even Calculator</strong> বানান: Fixed Cost, Variable Cost per unit, Selling Price, Units Sold → Revenue, Total Cost, Profit। <br>১) Goal Seek দিয়ে বের করুন লাভ ঠিক ০ হতে কত ইউনিট লাগবে <br>২) Data Table দিয়ে দাম × পরিমাণের একটা লাভের ম্যাট্রিক্স বানান <br>৩) Scenario Manager-এ Best/Normal/Worst তিনটা পরিস্থিতি সেভ করে Summary বানান <br>৪) শুধু ইনপুট ঘরগুলো আনলক রেখে শিট Protect করুন <br>৫) Print Area সেট করে, হেডার রিপিট করে PDF হিসেবে এক্সপোর্ট করুন <br>৬) উপরের ৮টা চেক নিজের ফাইলে চালান</div>`},
+
+  {n:29,t:"Excel Dashboard — সম্পূর্ণ ইন্টারঅ্যাক্টিভ রিপোর্ট",g:"Pivot + Slicer + Chart + KPI জোড়া দিয়ে এক পাতার জীবন্ত রিপোর্ট।",
+  html:`
+<h5>কাঠামো — Sheets-এর মতোই, কিন্তু আরও শক্তিশালী</h5>
+<table>
+<tr><th>শিট</th><th>কাজ</th><th>অবস্থা</th></tr>
+<tr><td><strong>Data</strong></td><td>Power Query দিয়ে আনা পরিষ্কার Table</td><td>লুকানো</td></tr>
+<tr><td><strong>Pivots</strong></td><td>সব Pivot Table এখানে</td><td>লুকানো</td></tr>
+<tr><td><strong>Lists</strong></td><td>ড্রপডাউনের তালিকা, টার্গেট</td><td>লুকানো</td></tr>
+<tr><td><strong>Dashboard</strong></td><td>শুধু চার্ট, KPI ও Slicer</td><td>দৃশ্যমান</td></tr>
+<tr><td><strong>Notes</strong></td><td>ডেটার উৎস, শেষ আপডেট, ধরে নেওয়া বিষয়</td><td>দৃশ্যমান</td></tr>
+</table>
+
+<h5>ধাপ ১ — ভিত্তি</h5>
+<ol class="steps">
+<li>Power Query দিয়ে ডেটা আনুন ও পরিষ্কার করুন (দিন ২৭)</li>
+<li>Table হিসেবে Load করুন, নাম দিন <code>tblData</code></li>
+<li>দরকারি সাহায্যকারী কলাম যোগ করুন — Sales, Profit, MonthName, Quarter</li>
+</ol>
+
+<h5>ধাপ ২ — Pivot-গুলো (একটা লুকানো শিটে)</h5>
+<p>প্রতিটা চার্টের জন্য একটা Pivot। ৫-৬টা বানান:</p>
+<ul>
+<li>মাস অনুযায়ী বিক্রি (Line chart-এর জন্য)</li>
+<li>অঞ্চল অনুযায়ী বিক্রি (Column chart)</li>
+<li>শীর্ষ ১০ পণ্য (Bar chart, সাজানো)</li>
+<li>Category অনুযায়ী ভাগ (Donut)</li>
+<li>বিক্রয়কর্মীর টেবিল (Sales, Target, Achievement %)</li>
+<li>KPI-র জন্য একটা সরল Pivot</li>
+</ul>
+<div class="warn"><b>খুব জরুরি</b>
+সব Pivot <strong>একই Table থেকে</strong> বানান। তাহলে একটা Slicer দিয়ে সবগুলো নিয়ন্ত্রণ করা যাবে। আলাদা আলাদা উৎস থেকে বানালে Slicer সবগুলোর সাথে জুড়বে না — আর ড্যাশবোর্ডের পুরো মজাটাই নষ্ট হবে।</div>
+
+<h5>ধাপ ৩ — Dashboard পাতা সাজানো</h5>
+<ol class="steps">
+<li>নতুন শিট → <em>View</em> ট্যাব → <strong>Gridlines-এর টিক তুলে দিন</strong>। সাথে সাথে ক্যানভাসের মতো পরিষ্কার দেখাবে।</li>
+<li>উপরে টাইটেল বার — কয়েকটা ঘর merge করে গাঢ় রং, সাদা বড় লেখা</li>
+<li>টাইটেলের নিচে Slicer বসানোর জন্য জায়গা রাখুন</li>
+<li>KPI কার্ডের জন্য ৪-৫টা বাক্স — merge করা ঘর, হালকা রং, বর্ডার</li>
+<li>নিচে চার্টের জন্য জায়গা ভাগ করুন</li>
+</ol>
+
+<h5>ধাপ ৪ — KPI কার্ড</h5>
+<div class="fx"><code>মোট বিক্রি   =GETPIVOTDATA("Sales", Pivots!$A$3)
+লাভের হার    =IFERROR(মোট লাভ/মোট বিক্রি, 0)
+বৃদ্ধির হার   =IFERROR(এই মাস/গত মাস-1, "")
+টার্গেট পূরণ  =IFERROR(মোট বিক্রি/Lists!$B$2, 0)</code></div>
+<p>কার্ডের ভেতরে সংখ্যাটা বড় ফন্টে (২৮-৩৬), নিচে ছোট করে লেবেল। উপরে-নিচের তীর দেখাতে Custom Number Format ব্যবহার করুন:</p>
+<div class="fx"><code>Format Cells → Custom:   ▲0.0%;▼0.0%;0.0%</code></div>
+<p>তিনটা অংশ সেমিকোলন দিয়ে আলাদা — ইতিবাচক, ঋণাত্মক, শূন্য। ইতিবাচক হলে উপরের তীর, ঋণাত্মক হলে নিচের।</p>
+
+<h5>ধাপ ৫ — চার্ট বসানো</h5>
+<ol class="steps">
+<li>Pivots শিটে গিয়ে Pivot সিলেক্ট করে Insert → Chart</li>
+<li>চার্টে ডান-ক্লিক → Cut → Dashboard শিটে Paste</li>
+<li>চার্টে ডান-ক্লিক → <em>PivotChart Options → Properties → Don't move or size with cells</em> — নইলে ফিল্টার বদলালে চার্ট লাফাবে</li>
+<li>চার্টের উপরের ফিল্টার বোতামগুলো লুকান — ডান-ক্লিক → <em>Hide All Field Buttons on Chart</em>। এটা না করলে ড্যাশবোর্ড অপেশাদার দেখায়।</li>
+<li>প্রতিটা চার্টের টাইটেলে <strong>উপসংহার</strong> লিখুন, শুধু নাম নয়</li>
+</ol>
+
+<h5>ধাপ ৬ — Slicer জোড়া দেওয়া</h5>
+<ol class="steps">
+<li>যেকোনো Pivot সিলেক্ট করে <em>Insert Slicer</em> → Region, Category, Month বাছুন</li>
+<li>Slicer গুলো Dashboard শিটে Cut-Paste করুন, উপরে সাজান</li>
+<li><strong>প্রতিটা Slicer-এ ডান-ক্লিক → Report Connections → সব Pivot-এ টিক দিন</strong></li>
+<li>একটা Timeline-ও বসান তারিখের জন্য</li>
+<li>Slicer ট্যাব → Columns সংখ্যা বাড়িয়ে আড়াআড়ি সাজান, Style বদলান</li>
+</ol>
+<div class="note"><b>ধাপ ৩-এর কাজটাই সবচেয়ে গুরুত্বপূর্ণ</b>
+Report Connections না দিলে Slicer শুধু একটা Pivot নিয়ন্ত্রণ করবে — বাকি চার্টগুলো নড়বে না। এটাই ড্যাশবোর্ড বানানোর সময় সবচেয়ে বেশি হওয়া ভুল। প্রতিটা Slicer-এ আলাদা করে সব Pivot টিক দিতে হয়।</div>
+
+<h5>ধাপ ৭ — শেষ ছোঁয়া</h5>
+<ul>
+<li>রং সীমিত রাখুন — <strong>একটা মূল রং + ধূসরের কয়েকটা শেড</strong>। যা গুরুত্বপূর্ণ শুধু সেটাই রঙিন।</li>
+<li>ফন্ট দুইটার বেশি নয়। ফন্ট সাইজ ৩-৪টার মধ্যে।</li>
+<li>সব শিট A1-এ রেখে সেভ করুন</li>
+<li>Data, Pivots, Lists শিট Hide করুন</li>
+<li>Dashboard শিট Protect করুন কিন্তু Slicer ব্যবহারের অনুমতি রাখুন (Protect Sheet-এ "Use PivotTable &amp; PivotChart" টিক দিন)</li>
+<li>একটা "শেষ আপডেট" তারিখ দেখান</li>
+<li>Notes শিটে লিখুন — কে বানিয়েছে, ডেটা কোথা থেকে, কীভাবে Refresh করতে হয়</li>
+</ul>
+<div class="task"><b>আজকের কাজ</b>
+Power Query থেকে শুরু করে Slicer পর্যন্ত একটা <strong>সম্পূর্ণ Sales Dashboard</strong> বানান — কমপক্ষে ৫টা KPI, ৪টা চার্ট, ৩টা Slicer ও ১টা Timeline। <br><br><strong>চূড়ান্ত পরীক্ষা:</strong> প্রতিটা Slicer-এর প্রতিটা অপশন একবার চেপে দেখুন — <strong>সবকিছু একসাথে বদলাচ্ছে কি না।</strong> একটা চার্ট না নড়লে সেটার Report Connections ঠিক করুন। কোথাও এরর দেখালে IFERROR দিয়ে মুড়ে দিন। <br><br>নাম দিন <strong>"Project 3 — Excel Sales Dashboard"</strong>। এই ফাইলটা ইন্টারভিউতে দেখানোর জন্য প্রস্তুত রাখুন।</div>`},
+
+  {n:30,t:"চূড়ান্ত প্রজেক্ট, ইন্টারভিউ প্রস্তুতি ও এরপর কী",g:"সব একসাথে জোড়া দেওয়া, নিজেকে যাচাই করা, আর পরের ধাপের পথ।",
+  html:`
+<h5>চূড়ান্ত প্রজেক্ট — HR Analytics System</h5>
+<p>একটা ফাইল যেখানে সব শেখা জিনিস থাকবে। এটা আপনার পোর্টফোলিওর মূল কাজ।</p>
+<table>
+<tr><th>শিট</th><th>যা থাকবে</th><th>যে দিন শিখেছেন</th></tr>
+<tr><td>RAW_Employees</td><td>১০০ কর্মীর তথ্য, Power Query দিয়ে পরিষ্কার</td><td>১৯, ২৭</td></tr>
+<tr><td>RAW_Attendance</td><td>৩ মাসের হাজিরা, Unpivot করা</td><td>২৭</td></tr>
+<tr><td>Lists</td><td>Department, Designation, District (নির্ভরশীল ড্রপডাউন)</td><td>১৪, ২৪</td></tr>
+<tr><td>Calc_Salary</td><td>Gross, কাটতি, Net — সব Table reference দিয়ে</td><td>৫, ২৩</td></tr>
+<tr><td>Employee_Card</td><td>ID লিখলে সেই কর্মীর সব তথ্য দেখাবে</td><td>১২, ১৩, ২৬</td></tr>
+<tr><td>Pivots</td><td>বিভাগ, জেলা, মাস অনুযায়ী বিশ্লেষণ</td><td>১৬, ২৫</td></tr>
+<tr><td>Dashboard</td><td>KPI, চার্ট, Slicer</td><td>২০, ২৯</td></tr>
+<tr><td>QC</td><td>যাচাইয়ের হিসাব — মোট, খালি, ডুপ্লিকেট</td><td>১৯</td></tr>
+<tr><td>Notes</td><td>ডকুমেন্টেশন</td><td>২৮</td></tr>
+</table>
+<p><strong>যে KPI গুলো থাকবে:</strong> মোট কর্মী, মোট বেতন খরচ, গড় বেতন, উপস্থিতির হার, ছুটির হার, ছেড়ে যাওয়ার হার (attrition), গড় চাকরির বয়স, বিভাগ অনুযায়ী খরচের ভাগ।</p>
+
+<h5>নিজেকে যাচাই করুন — এই ২০টা পারলে আপনি প্রস্তুত</h5>
+<ol>
+<li>Absolute ও Relative reference-এর পার্থক্য কী, কখন কোনটা লাগে?</li>
+<li>VLOOKUP আর INDEX+MATCH — কোনটা কেন ভালো?</li>
+<li>VLOOKUP কেন <code>#N/A</code> দেয়? তিনটা কারণ বলুন।</li>
+<li>COUNT ও COUNTA-র পার্থক্য?</li>
+<li>SUMIF ও SUMIFS-এ আর্গুমেন্টের ক্রম আলাদা কীভাবে?</li>
+<li>Pivot Table বানানোর জন্য ডেটা কেমন হতে হবে?</li>
+<li>Pivot Table-এ শতাংশ কীভাবে দেখাবেন? মাসিক গ্রোথ কীভাবে?</li>
+<li>একটা Slicer দিয়ে ৫টা Pivot নিয়ন্ত্রণ করবেন কীভাবে?</li>
+<li><kbd>Ctrl</kbd>+<kbd>T</kbd> কী করে এবং কেন এটা দরকার?</li>
+<li>Structured reference কী? উদাহরণ দিন।</li>
+<li>SUBTOTAL(9) আর SUBTOTAL(109)-এর পার্থক্য?</li>
+<li>Conditional Formatting-এ পুরো সারি রঙিন করার নিয়ম কী?</li>
+<li>নির্ভরশীল ড্রপডাউন কীভাবে বানায়?</li>
+<li>Power Query কী কাজে লাগে? Unpivot কী?</li>
+<li>Append ও Merge-এর পার্থক্য? Left Anti Join কখন লাগে?</li>
+<li>Goal Seek কী করে? একটা বাস্তব উদাহরণ দিন।</li>
+<li>নোংরা ডেটা পেলে প্রথম ৫টা কাজ কী?</li>
+<li>একটা রিপোর্টে <code>#DIV/0!</code> কীভাবে লুকাবেন?</li>
+<li>বড় ফাইল ধীর হয়ে গেলে কী করবেন?</li>
+<li>Google Sheets আর Excel — কোনটা কখন বেছে নেবেন?</li>
+</ol>
+<div class="note"><b>উত্তর দেওয়ার নিয়ম</b>
+ইন্টারভিউতে শুধু "SUMIFS দিয়ে করব" বলবেন না। বলবেন <strong>"আমি এটা এভাবে করেছিলাম, কারণ..."</strong> — নিজের প্রজেক্টের উদাহরণ দিন। এটাই আপনাকে বই-পড়া প্রার্থীদের থেকে আলাদা করবে। তাই ৩টা প্রজেক্ট ফাইল সাথে রাখুন।</div>
+
+<h5>যে ভুলগুলো নতুনরা করে — সচেতনভাবে এড়ান</h5>
+<ul>
+<li><strong>ফর্মুলায় সংখ্যা হার্ডকোড করা</strong> — <code>=B2*0.15</code> নয়, <code>=B2*$VATRate</code></li>
+<li><strong>Merged cell ব্যবহার</strong> — Sort, Filter, Pivot সব ভাঙে</li>
+<li><strong>এক ঘরে অনেক তথ্য</strong> — "Rahim, Dhaka, IT" একসাথে রাখা</li>
+<li><strong>টেবিলের মাঝখানে যোগফলের সারি</strong> — Pivot ও Filter নষ্ট করে</li>
+<li><strong>শিটের নাম Sheet1, Sheet2</strong> রেখে দেওয়া</li>
+<li><strong>Table না ব্যবহার করা</strong> — নতুন ডেটা এলে ফর্মুলা ধরে না</li>
+<li><strong>RAW ডেটার উপরে সরাসরি কাজ করা</strong> — ফেরার পথ বন্ধ</li>
+<li><strong>এরর ঢেকে না রাখা</strong> — রিপোর্টে <code>#N/A</code> দেখা মানে অপেশাদারিত্ব</li>
+<li><strong>নিজে চেক না করা</strong> — যোগফল বাইরে থেকে একবার মিলিয়ে দেখুন</li>
+</ul>
+
+<h5>এরপর কোন পথে যাবেন</h5>
+<table>
+<tr><th>লক্ষ্য</th><th>যা শিখবেন</th></tr>
+<tr><td><strong>ডেটা বিশ্লেষক</strong></td><td>Power BI বা Tableau → SQL → Python (pandas)</td></tr>
+<tr><td><strong>অ্যাকাউন্টস / ফাইন্যান্স</strong></td><td>Financial Modelling, Power Pivot + DAX, বাজেট ও ফোরকাস্টিং</td></tr>
+<tr><td><strong>অটোমেশন</strong></td><td>VBA Macro, Office Scripts, Google Apps Script, Zapier/Make</td></tr>
+<tr><td><strong>অপারেশন / MIS</strong></td><td>Power Query গভীরভাবে, Power Automate, ড্যাশবোর্ড ডিজাইন</td></tr>
+<tr><td><strong>ফ্রিল্যান্সিং</strong></td><td>পোর্টফোলিও বানান, Fiverr/Upwork-এ Excel automation ও dashboard সার্ভিস</td></tr>
+</table>
+<div class="warn"><b>সবচেয়ে গুরুত্বপূর্ণ কথাটা শেষে</b>
+এই ৩০ দিন আপনাকে <strong>টুল</strong> শিখিয়েছে। কিন্তু চাকরিতে দাম পায় যে <strong>প্রশ্ন করতে জানে</strong>। <br><br>"এই ডেটা দিয়ে ব্যবসার কোন সিদ্ধান্ত নেওয়া যাবে?" — এই প্রশ্নটা করতে শিখুন। যে শুধু ফর্মুলা জানে সে ৩০ হাজারের চাকরি পায়। যে ডেটা দেখে বলতে পারে "এই অঞ্চলে বিক্রি কমছে, কারণ সম্ভবত এটা" — সে ১ লাখের চাকরি পায়। <br><br>টুল ৩০ দিনে শেখা যায়। প্রশ্ন করার অভ্যাস তৈরি হয় প্রতিদিন আসল ডেটা নিয়ে কাজ করে।</div>
+<div class="task"><b>শেষ কাজ — এবং শুরুর কাজ</b>
+১) চূড়ান্ত প্রজেক্টটা শেষ করুন <br>২) উপরের ২০টা প্রশ্নের উত্তর নিজে লিখে ফেলুন — মুখে বলার আগে লিখলে গুছিয়ে যায় <br>৩) ৩টা প্রজেক্ট ফাইল একটা ফোল্ডারে রাখুন, নাম দিন "Excel Portfolio" <br>৪) <strong>এখন সবচেয়ে দরকারি ধাপ:</strong> নিজের জীবনের কোনো আসল ডেটা নিয়ে কাজ করুন — নিজের মাসিক খরচ, পরিবারের বাজার, কোনো ছোট ব্যবসার হিসাব। বানানো ডেটার চেয়ে আসল ডেটা দশগুণ বেশি শেখায়, কারণ আসল ডেটা সবসময় নোংরা ও অগোছালো। <br>৫) কাউকে শেখান। যা শিখেছেন তা অন্যকে বোঝাতে গেলেই বুঝবেন কোথায় আপনার ফাঁক আছে। <br><br>🎓 <strong>অভিনন্দন। ৩০ দিন শেষ। এখন আসল শেখা শুরু।</strong></div>`}
+  ]
+}
+];
+
+/* =======================================================================
+   RENDER + INTERACTIONS
+   ======================================================================= */
+const done = new Set();
+const nav = document.getElementById('nav');
+const content = document.getElementById('content');
+
+COURSE.forEach((ph,pi)=>{
+  const pd=document.createElement('div');
+  pd.className='navphase'; pd.textContent=ph.pn;
+  nav.appendChild(pd);
+
+  const head=document.createElement('div');
+  head.className='phasehead';
+  head.innerHTML='<div class="pn">'+ph.pn+'</div><h3>'+ph.title+'</h3><p>'+ph.desc+'</p>';
+  content.appendChild(head);
+
+  ph.days.forEach(d=>{
+    const a=document.createElement('a');
+    a.className='navlink'; a.dataset.day=d.n;
+    a.innerHTML='<span class="nvd">'+d.n+'</span><span class="nvt">'+d.t+'</span>';
+    a.onclick=e=>{
+      e.preventDefault();
+      const card=document.getElementById('day'+d.n);
+      card.classList.add('open');
+      card.scrollIntoView({behavior:'smooth',block:'start'});
+      document.getElementById('sidebar').classList.remove('show');
+    };
+    nav.appendChild(a);
+
+    const card=document.createElement('section');
+    card.className='day'; card.id='day'+d.n; card.dataset.day=d.n;
+    card.dataset.search=(d.n+' '+d.t+' '+d.g+' '+d.html).toLowerCase();
+    card.innerHTML=
+      '<div class="dayhead">'+
+        '<div class="daynum"><small>DAY</small><span>'+d.n+'</span></div>'+
+        '<div class="daymeta"><h4>'+d.t+'</h4><p>'+d.g+'</p></div>'+
+        '<div class="chk" title="সম্পন্ন হলে টিক দিন"></div>'+
+        '<div class="caret">▶</div>'+
+      '</div>'+
+      '<div class="body">'+d.html+'</div>';
+    content.appendChild(card);
+
+    card.querySelector('.dayhead').addEventListener('click',ev=>{
+      if(ev.target.classList.contains('chk')) return;
+      card.classList.toggle('open');
+    });
+    card.querySelector('.chk').addEventListener('click',ev=>{
+      ev.stopPropagation();
+      const on=ev.target.classList.toggle('on');
+      card.classList.toggle('done',on);
+      on?done.add(d.n):done.delete(d.n);
+      a.classList.toggle('done',on);
+      updateProgress();
+    });
+  });
+});
+
+/* copy buttons */
+document.querySelectorAll('.fx').forEach(fx=>{
+  const b=document.createElement('button');
+  b.className='cp'; b.textContent='COPY';
+  b.onclick=e=>{
+    e.stopPropagation();
+    navigator.clipboard.writeText(fx.querySelector('code').innerText);
+    b.textContent='COPIED'; setTimeout(()=>b.textContent='COPY',1200);
+  };
+  fx.appendChild(b);
+});
+
+/* progress */
+const bn=s=>String(s).replace(/[0-9]/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+function updateProgress(){
+  const total=document.querySelectorAll('.day').length;
+  const pct=total?done.size/total*100:0;
+  document.getElementById('progfill').style.width=pct+'%';
+  document.getElementById('progtxt').textContent=
+    bn(done.size)+' / '+bn(total)+' দিন সম্পন্ন'+(done.size===total&&total?' 🎉 অভিনন্দন!':'');
+}
+updateProgress();
+
+/* search */
+document.getElementById('search').addEventListener('input',e=>{
+  const q=e.target.value.trim().toLowerCase();
+  let hits=0;
+  document.querySelectorAll('.day').forEach(c=>{
+    const m=!q||c.dataset.search.includes(q);
+    c.classList.toggle('hidden',!m);
+    if(m){hits++; if(q) c.classList.add('open');}
+  });
+  document.querySelectorAll('.navlink').forEach(l=>{
+    const c=document.getElementById('day'+l.dataset.day);
+    l.classList.toggle('hidden',c.classList.contains('hidden'));
+  });
+  document.querySelectorAll('.phasehead').forEach(h=>{h.style.display=q?'none':'block'});
+  document.getElementById('empty').classList.toggle('show',hits===0);
+});
+
+/* expand / collapse all */
+const eb=document.getElementById('expandBtn');
+eb.onclick=()=>{
+  const open=eb.dataset.o==='1';
+  document.querySelectorAll('.day').forEach(c=>c.classList.toggle('open',!open));
+  eb.dataset.o=open?'0':'1';
+  eb.textContent=open?'সব খুলুন':'সব বন্ধ করুন';
+};
+
+/* theme */
+const tb=document.getElementById('themeBtn');
+tb.onclick=()=>{
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+  tb.textContent=dark?'🌙':'☀️';
+};
+
+/* mobile menu */
+document.getElementById('menuBtn').onclick=()=>
+  document.getElementById('sidebar').classList.toggle('show');
+
+/* open day 1 by default */
+const d1=document.getElementById('day1'); if(d1) d1.classList.add('open');
+
+/* active nav on scroll */
+if(typeof IntersectionObserver!=='undefined'){
+  const io=new IntersectionObserver(es=>{
+    es.forEach(en=>{
+      if(en.isIntersecting){
+        document.querySelectorAll('.navlink').forEach(l=>l.classList.remove('active'));
+        const l=document.querySelector('.navlink[data-day="'+en.target.dataset.day+'"]');
+        if(l) l.classList.add('active');
+      }
+    });
+  },{rootMargin:'-70px 0px -70% 0px'});
+  document.querySelectorAll('.day').forEach(c=>io.observe(c));
+}
+</script>
+</body>
+</html>
